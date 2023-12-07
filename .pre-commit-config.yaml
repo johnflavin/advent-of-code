@@ -1,11 +1,11 @@
 files: 'advent_of_code\/'
 repos:
 -   repo: https://github.com/python/black
-    rev: 21.12b0
+    rev: 23.11.0
     hooks:
     -   id: black
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+-   repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
     hooks:
     -   id: flake8
         args: [--per-file-ignores=__init__.py:F401]
