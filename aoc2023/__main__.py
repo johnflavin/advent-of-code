@@ -99,7 +99,7 @@ def main(argv):
 
     # Determine date of puzzle to run and import main from there
     datestamp = args.date
-    day = datetime.now().day if datestamp is None else datestamp.split("-")[-1]
+    day = datetime.now().day if datestamp is None else int(datestamp.split("-")[-1])
     if args.both:
         exit_code = 0
         for part in Part:
