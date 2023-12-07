@@ -31,7 +31,12 @@ def run_puzzle_func(day: str | int, part: Part) -> tuple[str, int]:
     puzzle_module = import_puzzle_module(day)
     puzzle_func = puzzle_module.part_one if part == Part.ONE else puzzle_module.part_two
 
-    example = iter(puzzle_module.EXAMPLE.strip().split("\n"))
+    raw_example = (
+        puzzle_module.PART_ONE_EXAMPLE
+        if part == Part.ONE
+        else puzzle_module.PART_TWO_EXAMPLE
+    )
+    example = iter(raw_example.strip().split("\n"))
     expected_example_result = (
         puzzle_module.PART_ONE_EXAMPLE_RESULT
         if part == Part.ONE

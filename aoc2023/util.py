@@ -17,7 +17,8 @@ YEAR = 2023
 
 
 class PuzzleModule(Protocol):
-    EXAMPLE: str
+    PART_ONE_EXAMPLE: str
+    PART_TWO_EXAMPLE: str
     PART_ONE_EXAMPLE_RESULT: int | str
     PART_TWO_EXAMPLE_RESULT: int | str
     PART_ONE_RESULT: int | str | None
