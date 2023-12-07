@@ -1,6 +1,7 @@
 import importlib
 import importlib.resources
 from enum import Enum
+from os import remove
 from pathlib import Path
 from typing import Iterable, Protocol, cast
 
@@ -44,11 +45,7 @@ def download_puzzle_data(day: str | int) -> bytes:
     cookie = read_session_cookie()
 
     r = requests.get(url, cookies={"session": cookie})
-    try:
-        r.raise_for_status()
-    except requests.RequestException as e:
-        print(e.response.status_code, e.response.text)
-        raise SystemExit(f"Could not load data for {YEAR}-12-{day:02}")
+    r.raise_for_status()
     return r.content
 
 
@@ -61,11 +58,20 @@ def find_input_file(day: str | int) -> Path:
     return INPUT_RESOURCES / f"{YEAR}-12-{day:02}.txt"
 
 
+def get_input_file_data_and_write_file(day: str | int, input_file: Path):
+    try:
+        with open(input_file, "wb") as f:
+            f.write(download_puzzle_data(day))
+    except requests.RequestException as e:
+        remove(input_file)
+        print(e.response.status_code, e.response.text)
+        raise SystemExit(f"Could not load data for {YEAR}-12-{day:02}")
+
+
 def get_input_file_lines(day: str | int) -> Iterable[str]:
     input_file = find_input_file(day)
     if not input_file.exists():
-        with open(input_file, "wb") as f:
-            f.write(download_puzzle_data(day))
+        get_input_file_data_and_write_file(day, input_file)
 
     def inner():
         with input_file.open("r") as f:
