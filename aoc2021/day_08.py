@@ -36,7 +36,7 @@ def part_one(lines: Iterable[str]) -> int:
         num_uniques += sum(
             1
             for output in outputs.split()
-            if (l := len(output)) == 2 or l == 3 or l == 4 or l == 7
+            if (le := len(output)) == 2 or le == 3 or le == 4 or le == 7
         )
     return num_uniques
 
@@ -101,7 +101,7 @@ def decode_line(line: str) -> int:
 
     # Use the mapping to turn outputs into integers
     return sum(
-        10 ** i * mapping.index(set(output))
+        10**i * mapping.index(set(output))
         for i, output in enumerate(reversed(outputs.split()))
     )
 

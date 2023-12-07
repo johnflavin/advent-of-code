@@ -506,7 +506,6 @@ def pretty_print_template(tunnel_depth: int) -> str:
 
 
 def pretty_print(state: BoardState, graph: GraphInfo) -> str:
-
     sorted_apods = sorted(state.apod_states, key=lambda s: s.location)
     next_apod = sorted_apods.pop(0)
     loc_strs = ["."] * len(graph.all_locs)

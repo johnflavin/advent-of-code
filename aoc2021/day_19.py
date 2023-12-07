@@ -292,7 +292,6 @@ def read_lines(lines: Iterable[str]) -> list[list[Vector]]:
 def match_beacons(
     scanners: list[list[Vector]],
 ) -> tuple[set[Vector], dict[int, Vector]]:
-
     # Let's say two scanners overlap.
     # When we rotate one of the scanners, there will be a particular rotation
     #  where it will align with the other.
@@ -308,16 +307,13 @@ def match_beacons(
     for (s1_idx, s1_beacons), (s2_idx, s2_beacons) in combinations(
         enumerate(scanners), 2
     ):
-
         # All the possible rotations of the second scanner
         # relative to the first
         for r in range(len(ROTATIONS)):
-
             beacon_diffs: dict[Vector, int] = defaultdict(lambda: 0)
 
             # All the pairs of beacons between the two scanners
             for s1_beacon_pos, s2_beacon_pos in product(s1_beacons, s2_beacons):
-
                 # This is the position scanner 2 would report
                 # for this beacon if the scanner were rotated.
                 # We are trying all the rotations to find one

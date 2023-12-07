@@ -117,7 +117,6 @@ def parse_lines(lines: Iterable[str]) -> tuple[list[int], list[Board]]:
 
 
 def part_two(lines: Iterable[str]) -> int:
-
     draws, boards = parse_lines(lines)
     id_board = dict(enumerate(boards, 1))
 

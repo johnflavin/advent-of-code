@@ -99,7 +99,7 @@ def spawn(rules: Rules, pair: Pair, count: int) -> tuple[PairCount, ...]:
 
 def count_pairs(pair_counts: Iterable[PairCount]) -> PairCounter:
     counts: PairCounter = defaultdict(lambda: 0)
-    for (pair, count) in pair_counts:
+    for pair, count in pair_counts:
         # print(pair, count)
         counts[pair] += count
     return counts
@@ -110,13 +110,12 @@ def count_elements(pair_counts: Iterable[PairCount]) -> ElementCounter:
     The element should only be the right side of the pair.
     """
     counts: ElementCounter = defaultdict(lambda: 0)
-    for ((_, right), count) in pair_counts:
+    for (_, right), count in pair_counts:
         counts[right] += count
     return counts
 
 
 def solution(lines: Iterable[str], n: int) -> int:
-
     template, rules = parse_lines(lines)
 
     # Count how many of each pair we have right now

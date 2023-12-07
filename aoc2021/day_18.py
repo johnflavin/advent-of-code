@@ -98,7 +98,7 @@ class Pair:
         return f"[{self.left},{self.right}]"
 
     def __add__(self, __o: object):
-        if not type(self) == type(__o):
+        if not type(self) is type(__o):
             if isinstance(__o, int):
                 # This makes sum work, since 0 + Pair[...] -> Pair[...]
                 return self

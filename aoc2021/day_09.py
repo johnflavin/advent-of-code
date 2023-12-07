@@ -114,7 +114,6 @@ def process_lines(lines: Iterable[str]) -> tuple[Heights, NeighborsFunc]:
 def low_points(
     heights: Heights, neighbors_func: NeighborsFunc
 ) -> Iterable[tuple[Pt, int]]:
-
     for row_idx, row in enumerate(heights):
         for col_idx, value in enumerate(row):
             neighbors = tuple(neighbors_func((row_idx, col_idx)))

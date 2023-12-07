@@ -198,7 +198,6 @@ def play_quantum_game(start: GameState) -> dict[int, int]:
 
 
 def part_one(lines: Iterable[str]) -> int:
-
     players = parse_lines(lines)
     start = GameState(1000, *players)
     finished_game = play_deterministic(start)

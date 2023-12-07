@@ -53,7 +53,6 @@ def download_puzzle_data(day: str | int) -> bytes:
 
 
 def read_session_cookie() -> str:
-
     with open(SESSION_COOKIE_FILE, "r") as f:
         return f.read().strip()
 
@@ -72,4 +71,4 @@ def get_input_file_lines(day: str | int) -> Iterable[str]:
         with input_file.open("r") as f:
             yield from f
 
-    return map(lambda l: l.strip(), inner())
+    return map(lambda line: line.strip(), inner())

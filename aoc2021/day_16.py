@@ -116,7 +116,7 @@ class BitReader:
         unmasked = self.message >> (self.length - num - self.read_head)
 
         # Cut off bits before the ones we want by masking to the end
-        mask = 2 ** num - 1
+        mask = 2**num - 1
 
         # Update the read head so next time we get the next bits
         self.read_head += num
@@ -124,14 +124,12 @@ class BitReader:
         return unmasked & mask
 
     def read_remaining(self) -> tuple[int, int]:
-
         # number of bits remaining
         num = self.length - self.read_head
         return self.read(num), num
 
 
 def decode_packets(message: int, length: int) -> Iterable[Packet]:
-
     # print("BEGIN PACKET")
 
     reader = BitReader(message, length)
@@ -152,7 +150,6 @@ def decode_packets(message: int, length: int) -> Iterable[Packet]:
         value = 0
         value_bit_len = 0
         while keep_reading:
-
             # read five more bits off the message
             chunk = reader.read(5)
             # print(f"{chunk=:05b}")
