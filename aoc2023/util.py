@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Iterable, Protocol, cast
 
 import requests
+from requests.utils import add_dict_to_cookiejar
 
 
 RESOURCES = Path(__package__).parent / "resources"
@@ -44,7 +45,9 @@ def download_puzzle_data(day: str | int) -> bytes:
     url = f"https://adventofcode.com/{YEAR}/day/{day}/input"
     cookie = read_session_cookie()
 
-    r = requests.get(url, cookies={"session": cookie})
+    s = requests.Session()
+    add_dict_to_cookiejar(s.cookies, {"session": cookie})
+    r = s.get(url)
     r.raise_for_status()
     return r.content
 
