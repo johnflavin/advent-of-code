@@ -83,12 +83,13 @@ Now do that process again with the others.
 Given the intersection number of the first two, find the intersection number
 with that and the next cycle period (multiply, then divide by gcd).
 Once we've done that with all of them, we have found our step number.
+
+Later note: Turns out this is just lcm. Who knew?
 """
 
 from collections.abc import Iterable
-from functools import reduce
 from itertools import cycle
-from math import gcd
+from math import lcm
 
 
 PART_ONE_EXAMPLE = """\
@@ -143,7 +144,7 @@ def just_stop_walking(steps: str, nodes: list[str], node_map: dict[str, str]) ->
 
         nodes = next_nodes
 
-    return reduce(lambda cyc1, cyc2: int(cyc1 * cyc2 / gcd(cyc1, cyc2)), cycles)
+    return lcm(*cycles)
 
 
 def parse(lines: Iterable[str]) -> tuple[str, dict[str, str]]:
