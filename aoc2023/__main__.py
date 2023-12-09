@@ -28,6 +28,7 @@ def puzzle_result_output(expected: int | str, actual: int | str) -> tuple[str, b
 
 
 def run_puzzle_func(day: str | int, part: Part) -> tuple[str, int]:
+    print(f"Part {part.value}")
     puzzle_module = import_puzzle_module(day)
     puzzle_func = puzzle_module.part_one if part == Part.ONE else puzzle_module.part_two
 
@@ -50,6 +51,8 @@ def run_puzzle_func(day: str | int, part: Part) -> tuple[str, int]:
     example_output = f"Example: {example_output}"
     if not example_is_correct:
         return example_output, 1
+
+    print(example_output)
 
     puzzle = get_input_file_lines(day)
     actual_puzzle_result = puzzle_func(puzzle)
@@ -74,7 +77,7 @@ def run_puzzle_func(day: str | int, part: Part) -> tuple[str, int]:
         puzzle_output = f"Puzzle: {puzzle_output}"
         exit_code = not puzzle_is_correct
 
-    return f"Part {part.value}\n{example_output}\n{puzzle_output}", exit_code
+    return puzzle_output, exit_code
 
 
 def main(argv):
