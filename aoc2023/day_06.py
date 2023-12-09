@@ -88,7 +88,7 @@ def parse_lines(lines: Iterable[str]) -> tuple[list[int], list[int]]:
     else:
         raise Exception("Parse error: " + time_line)
     if dist_match := dist_re.match(dist_line):
-        dists = [int(num) for num in dist_match.group("numbers").split()]
+        dists = list(map(int, dist_match.group("numbers").split()))
     else:
         raise Exception("Parse error: " + dist_line)
 

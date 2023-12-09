@@ -37,9 +37,7 @@ PART_TWO_RESULT = 6420979
 def parse(line: str) -> tuple[set[int], set[int]]:
     _, numbers = line.split(": ")
     winning_numbers, my_numbers = numbers.split(" | ")
-    return set(int(num) for num in winning_numbers.split()), set(
-        int(num) for num in my_numbers.split()
-    )
+    return set(map(int, winning_numbers.split())), set(map(int, my_numbers.split()))
 
 
 def calculate_points(winning_numbers: set[int], my_numbers: set[int]) -> int:

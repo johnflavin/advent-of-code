@@ -155,7 +155,7 @@ def predict(seq: list[int], diag: Direction) -> int:
 
 
 def predict_all(lines: Iterable[str], direction: Direction) -> int:
-    return sum(predict([int(st) for st in line.split()], direction) for line in lines)
+    return sum(predict(list(map(int, line.split())), direction) for line in lines)
 
 
 def part_one(lines: Iterable[str]) -> int:

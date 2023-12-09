@@ -322,7 +322,7 @@ def parse_lines(lines: Iterable[str]) -> tuple[list[int], Map]:
     # Read seeds
     seed_line = next(lines)
     _, seed_num_strs = seed_line.split(": ")
-    seed_nums = [int(seed_num) for seed_num in seed_num_strs.split()]
+    seed_nums = list(map(int, seed_num_strs.split()))
 
     # Blank
     next(lines)
@@ -364,7 +364,7 @@ def parse_lines(lines: Iterable[str]) -> tuple[list[int], Map]:
 
 def part_one(lines: Iterable[str]) -> int:
     nums, the_map = parse_lines(lines)
-    nums = [the_map.map(num) for num in nums]
+    nums = list(map(the_map.map, nums))
     return min(nums)
 
 

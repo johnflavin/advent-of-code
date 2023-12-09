@@ -98,10 +98,8 @@ def line_to_digit_part2(line: str) -> int:
 
 
 def part_one(lines: Iterable[str]) -> int:
-    digits = (line_to_digit_part1(line) for line in lines if line)
-    return sum(digits)
+    return sum(map(line_to_digit_part1, lines))
 
 
 def part_two(lines: Iterable[str]) -> int:
-    digits = (line_to_digit_part2(line) for line in lines if line)
-    return sum(digits)
+    return sum(map(line_to_digit_part2, lines))
