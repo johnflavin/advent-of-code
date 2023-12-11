@@ -17,6 +17,11 @@ Create offset tables by accumulating empty rows/cols.
 Find distances with pairwise differences.
 
 PART 2
+Instead of expanding each empty row/col into two, now expand into one million.
+
+Examples are a little weird and don't fit my automated system. Had to check manually.
+If we expand empties by 10x, answer is 1030.
+If we expand by 100x, answer is 8410.
 """
 
 from collections.abc import Iterable
@@ -37,23 +42,22 @@ PART_ONE_EXAMPLE = """\
 """
 PART_ONE_EXAMPLE_RESULT = 374
 PART_ONE_RESULT = 10154062
-PART_TWO_EXAMPLE = """\
-"""
-PART_TWO_EXAMPLE_RESULT = None
-PART_TWO_RESULT = None
+PART_TWO_EXAMPLE = PART_ONE_EXAMPLE
+PART_TWO_EXAMPLE_RESULT = 82000210
+PART_TWO_RESULT = 553083047914
 
 
 Coord = tuple[int, int]
 
 
-def parse(lines: Iterable[str]) -> list[Coord]:
+def parse(lines: Iterable[str], expansion_factor: int = 2) -> list[Coord]:
     # Find galaxies
     coords = []
     unoccupied_rows = []
     unoccupied_cols = None
     for row, line in enumerate(lines):
-        unoccupied_cols = unoccupied_cols or [1] * len(line)
-        unoccupied_row = 1
+        unoccupied_cols = unoccupied_cols or [expansion_factor - 1] * len(line)
+        unoccupied_row = expansion_factor - 1
         for col, ch in enumerate(line):
             if ch == "#":
                 coords.append((row, col))
@@ -86,5 +90,5 @@ def part_one(lines: Iterable[str]) -> int:
 
 
 def part_two(lines: Iterable[str]) -> int:
-    # thing = (line for line in lines if line)
-    return -1
+    coords = parse(lines, expansion_factor=int(1e6))
+    return sum(starmap(distance, combinations(coords, 2)))
