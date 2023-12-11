@@ -18,6 +18,10 @@ YEAR = 2023
 Coord = tuple[int, int]
 
 
+def revsub(one: int, two: int) -> int:
+    return two - one
+
+
 class PuzzleModule(Protocol):
     PART_ONE_EXAMPLE: str
     PART_TWO_EXAMPLE: str

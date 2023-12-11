@@ -107,6 +107,7 @@ I think I'll go back to the "work across the layers" method, where we do
 But I'll make the generation phase more efficient in part one.
 """
 
+from .util import revsub
 from collections.abc import Iterable
 from enum import Enum
 from itertools import accumulate, pairwise, starmap
@@ -123,10 +124,6 @@ PART_ONE_RESULT = 1647269739
 PART_TWO_EXAMPLE = PART_ONE_EXAMPLE
 PART_TWO_EXAMPLE_RESULT = 2
 PART_TWO_RESULT = 864
-
-
-def revsub(one: int, two: int) -> int:
-    return two - one
 
 
 class Direction(Enum):
