@@ -84,11 +84,14 @@ def distance(coord1: Coord, coord2: Coord) -> int:
     return abs(coord2[0] - coord1[0]) + abs(coord2[1] - coord1[1])
 
 
-def part_one(lines: Iterable[str]) -> int:
-    coords = parse(lines)
+def run_the_thing(lines: Iterable[str], expansion_factor: int = 2):
+    coords = parse(lines, expansion_factor=expansion_factor)
     return sum(starmap(distance, combinations(coords, 2)))
+
+
+def part_one(lines: Iterable[str]) -> int:
+    return run_the_thing(lines)
 
 
 def part_two(lines: Iterable[str]) -> int:
-    coords = parse(lines, expansion_factor=int(1e6))
-    return sum(starmap(distance, combinations(coords, 2)))
+    return run_the_thing(lines, expansion_factor=int(1e6))
