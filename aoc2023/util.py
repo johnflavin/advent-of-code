@@ -15,6 +15,8 @@ SESSION_COOKIE_FILE = RESOURCES / "session.txt"
 
 YEAR = 2023
 
+Coord = tuple[int, int]
+
 
 class PuzzleModule(Protocol):
     PART_ONE_EXAMPLE: str

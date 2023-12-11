@@ -24,6 +24,7 @@ If we expand empties by 10x, answer is 1030.
 If we expand by 100x, answer is 8410.
 """
 
+from .util import Coord
 from collections.abc import Iterable
 from itertools import accumulate, combinations, starmap
 
@@ -45,9 +46,6 @@ PART_ONE_RESULT = 10154062
 PART_TWO_EXAMPLE = PART_ONE_EXAMPLE
 PART_TWO_EXAMPLE_RESULT = 82000210
 PART_TWO_RESULT = 553083047914
-
-
-Coord = tuple[int, int]
 
 
 def parse(lines: Iterable[str], expansion_factor: int = 2) -> list[Coord]:

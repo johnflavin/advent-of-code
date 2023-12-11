@@ -69,6 +69,7 @@ Size of set is number inside.
 """
 
 import networkx as nx
+from .util import Coord
 from collections.abc import Iterable
 from networkx import Graph
 
@@ -102,7 +103,7 @@ DIST = "distance"
 VISITED = "visited"
 
 
-def parse(lines: Iterable[str]) -> tuple[Graph, tuple[int, int]]:
+def parse(lines: Iterable[str]) -> tuple[Graph, Coord]:
     graph = Graph()
     start = None
     for row, line in enumerate(lines):
