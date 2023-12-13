@@ -40,6 +40,15 @@ Shout out to reddit user Successful_Ninja4181 whose implementation I stole.
 Much more successful than me, I guess.
 https://www.reddit.com/r/adventofcode/comments/18ge41g/comment/kd3mplj/
 
+Later update
+Redid logic following tutorial by StaticMoose in
+https://www.reddit.com/r/adventofcode/comments/18hbbxe/2023_day_12python_stepbystep_tutorial_with_bonus/
+
+This was much more comprehensible than the other thing I copied. I could follow this.
+And it was much more like my own logic that I abandoned.
+I think I tried to get a bit too fancy, tried to do a bit too much at once,
+where I should have stuck to a more straightforward recursion.
+
 PART 2
 Take the input, multiply the pattern by 5 and join with ?, multiply spans by 5 too.
 """
@@ -63,46 +72,79 @@ PART_TWO_EXAMPLE_RESULT = 525152
 PART_TWO_RESULT = 2043098029844
 
 
+QUESTION_DOT = set("?.")
+
+
+def pound(pattern: str, spans: tuple[int]):
+    span = spans[0]
+
+    # If the first is a pound, then the first n characters must be
+    # able to be treated as a pound, where n is the first span number
+    # If we see anything other than # or ? in the first n, it is impossible
+    if "." in pattern[:span]:
+        return 0
+
+    # If the rest of the record is just the last span, then we're
+    # done and there's only one possibility
+    if len(pattern) == span:
+        # Make sure this is the last span
+        return int(len(spans) == 1)
+
+    # Make sure the character that follows this group can be a seperator
+    if pattern[span] in QUESTION_DOT:
+        # It can be seperator, so skip it and reduce to the next span
+        return calc(pattern[span + 1 :], spans[1:])
+
+    # Can't be handled, there are no possibilities
+    return 0
+
+
 @cache
-def get_combs(pattern: str, spans: tuple[int]) -> int:
-    cur_count = spans[0]
+def calc(pattern: str, spans: tuple[int]) -> int:
+    # Did we run out of groups? We might still be valid
+    if not spans:
+        # Make sure there aren't more damaged springs, if so, we're valid
+        return int("#" not in pattern)
 
-    total = 0
+    # Remove all leading and trailing dots
+    if pattern:
+        pattern = pattern.strip(".")
 
-    hs_pos = None
+    required_springs = sum(spans)
+    if len(spans) + required_springs - 1 > len(pattern):
+        # The pattern isn't long enough to hold all the spans
+        return 0
 
-    for idx in range(len(pattern) - cur_count + 1):
-        region = pattern[idx : idx + cur_count]
+    num_springs = pattern.count("#")
+    if (
+        num_springs > required_springs
+        or num_springs + pattern.count("?") < required_springs
+    ):
+        # The pattern either has more springs than we should have, or
+        # not enough spaces to hold the springs we should have
+        return 0
 
-        # Only a valid island if it has "?" or "#"
-        has_dot = "." in region
+    # Handle logic (and recurse) for next character in pattern
+    if pattern[0] == "#":
+        # Test pound logic
+        out = pound(pattern, spans)
+    elif pattern[0] == "?":
+        # Recurse into both branches
+        # When we start with a dot we are just going to remove it anyway,
+        #  so we save a step by just removing the next character
+        out = calc(pattern[1:], spans) + pound(pattern, spans)
+    else:
+        raise RuntimeError
 
-        # Over extended
-        over_ext = idx + cur_count < len(pattern) and pattern[idx + cur_count] == "#"
-
-        # Following a #
-        prev_c = idx > 0 and pattern[idx - 1] == "#"
-
-        if not (has_dot or over_ext or prev_c):
-            if len(spans) == 1:
-                if "#" not in pattern[idx + cur_count + 1 :]:
-                    total += 1
-            else:
-                total += get_combs(pattern[idx + cur_count + 1 :], spans[1:])
-
-        if hs_pos is not None and hs_pos < idx:
-            break
-
-        if hs_pos is None and "#" in region:
-            hs_pos = idx + region.index("#")
-
-    return total
+    # print(pattern, ",".join(map(str, spans)), out)
+    return out
 
 
 def solve(line: str):
     pattern, spans = line.split(maxsplit=2)
     spans = tuple(map(int, spans.split(",")))
-    return get_combs(pattern, spans)
+    # print("-"*10)
+    return calc(pattern, spans)
 
 
 def part_one(lines: Iterable[str]) -> int:
@@ -114,7 +156,8 @@ def solve2(line: str):
     pattern = "?".join([pattern] * 5)
     spans = tuple(map(int, spans.split(",")))
     spans = (*spans, *spans, *spans, *spans, *spans)
-    return get_combs(pattern, spans)
+    # print("-" * 10)
+    return calc(pattern, spans)
 
 
 def part_two(lines: Iterable[str]) -> int:
