@@ -6,22 +6,22 @@ authors = ["John Flavin"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 requests = "^2.26.0"
 pyperclip = "^1.8.2"
-networkx = "^2.6.3"
+networkx = "^3.2"
 
 [tool.poetry.dev-dependencies]
-black = "^21.12b0"
-pytest = "^6.2.5"
-pre-commit = "^2.16.0"
-flake8 = "^4.0.1"
-mypy = "^0.910"
+black = "^23"
+pytest = "^7"
+pre-commit = "^3"
+flake8 = "^6"
+mypy = "^1"
 types-requests = "^2.26.1"
-ipython = "^7.30.1"
+ipython = "^8"
 
 [tool.black]
-target-version =['py310']
+target-version =['py311']
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
