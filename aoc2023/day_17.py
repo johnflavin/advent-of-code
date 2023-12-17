@@ -44,19 +44,17 @@ PART_TWO_RESULT = 1249
 log = logging.getLogger(__name__)
 
 # 0 N, 1 W, 2 S, 3 E
-STEPS = (0, 1, 2, 3)
-STEP_VECS = (
+DIRECTION_VECS = (
     (-1, 0),
     (0, -1),
     (1, 0),
     (0, 1),
 )
-DBG_STEP = (
+DBG_DIR = (
     "N",
     "W",
     "S",
     "E",
-    "-",
 )
 
 
@@ -85,17 +83,28 @@ def find_lowest_cost_path(
             0,
         ),
     )
+    heapq.heappush(
+        heap,
+        (
+            start_dist,
+            0,
+            start_row,
+            start_col,
+            2,
+            0,
+        ),
+    )
     visited: set[tuple[int, int, int, int]] = set()
     while heap:
-        heuristic, heat, pt_row, pt_col, step_idx, step_count = heapq.heappop(heap)
+        heuristic, heat, pt_row, pt_col, dir_idx, dir_count = heapq.heappop(heap)
 
         # Have we been here?
-        visit = (pt_row, pt_col, step_idx, step_count)
+        visit = (pt_row, pt_col, dir_idx, dir_count)
         if visit in visited:
             if is_debug:
                 log.debug(
                     f" + Already visited {pt_row}, {pt_col} "
-                    f"via {DBG_STEP[step_idx]}({step_count})"
+                    f"via {DBG_DIR[dir_idx]}({dir_count})"
                 )
             continue
 
@@ -104,7 +113,7 @@ def find_lowest_cost_path(
         if is_debug:
             log.debug(
                 f" + Visiting {pt_row}, {pt_col} via "
-                f"{DBG_STEP[step_idx]}({step_count}) "
+                f"{DBG_DIR[dir_idx]}({dir_count}) "
                 f"{heuristic=}"
             )
 
@@ -116,27 +125,27 @@ def find_lowest_cost_path(
             break
 
         # Find possible next moves
-        next_step_deltas = [1, 0, -1]
-        for next_step_delta in next_step_deltas:
-            next_step_idx = (step_idx + next_step_delta) % 4
+        next_dir_deltas = [1, 0, -1]
+        for next_dir_delta in next_dir_deltas:
+            next_dir_idx = (dir_idx + next_dir_delta) % 4
             if is_debug:
-                log.debug(f" ++ Examining next step {DBG_STEP[next_step_idx]}")
+                log.debug(f" ++ Examining next direction {DBG_DIR[next_dir_idx]}")
 
             if is_part_two:
-                next_step_count = 4 if next_step_delta else max(step_count + 1, 4)
-                next_num_steps = 4 if next_step_delta else next_step_count - step_count
+                next_dir_count = 4 if next_dir_delta else max(dir_count + 1, 4)
+                next_num_steps = 4 if next_dir_delta else next_dir_count - dir_count
             else:
-                next_step_count = 1 if next_step_delta else step_count + 1
+                next_dir_count = 1 if next_dir_delta else dir_count + 1
                 next_num_steps = 1
 
-            if next_step_count > (3 if not is_part_two else 10):
+            if next_dir_count > (3 if not is_part_two else 10):
                 if is_debug:
                     log.debug(" +++ too many steps")
                 continue
-            next_step_vec = STEP_VECS[next_step_idx]
+            next_dir_row, next_dir_col = DIRECTION_VECS[next_dir_idx]
 
-            next_pt_row = pt_row + next_step_vec[0] * next_num_steps
-            next_pt_col = pt_col + next_step_vec[1] * next_num_steps
+            next_pt_row = pt_row + next_dir_row * next_num_steps
+            next_pt_col = pt_col + next_dir_col * next_num_steps
 
             if not (-1 < next_pt_row < num_rows and -1 < next_pt_col < num_cols):
                 if is_debug:
@@ -144,9 +153,7 @@ def find_lowest_cost_path(
                 continue
 
             next_heat = heat + sum(
-                heatmap[pt_row + next_step_vec[0] * step_i][
-                    pt_col + next_step_vec[1] * step_i
-                ]
+                heatmap[pt_row + next_dir_row * step_i][pt_col + next_dir_col * step_i]
                 for step_i in range(1, next_num_steps + 1)
             )
             next_dist = (num_rows - 1 - next_pt_row) + (num_cols - 1 - next_pt_col)
@@ -161,8 +168,8 @@ def find_lowest_cost_path(
                     next_heat,
                     next_pt_row,
                     next_pt_col,
-                    next_step_idx,
-                    next_step_count,
+                    next_dir_idx,
+                    next_dir_count,
                 ),
             )
 
