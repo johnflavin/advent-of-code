@@ -6,7 +6,7 @@ authors = ["John Flavin"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 requests = "^2.26.0"
 pyperclip = "^1.8.2"
 networkx = "^3.2"
