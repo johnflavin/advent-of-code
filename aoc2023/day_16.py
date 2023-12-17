@@ -19,18 +19,40 @@ Switching to a recursive algo might work.
 I put in a point and heading, it returns all the points it visits after that.
 Edge case: wall. That one is easy.
 But how do I do tell if I've visited a location before?
-    I need to know where to cut off a path if I've already visited this point in this direction.
+    I need to know where to cut off a path if I've already visited
+    this point in this direction.
     With just the point I am on now, it doesn't seem like there is any memory.
 Maybe I have to build the cache myself? Like, when I step recursively I could put
     a placeholder value like None or -1 into the cache.
     That way if I encounter it again later in the journey, I can know that I should
     stop there and not continue.
+
+No, I want to use the built-in cache.
+To do that I'll need to only send in cachable args to my new function,
+    like the map and my current step.
+Specifically, I can't send in the previously visited locations.
+So how do I avoid my cachable function looping forever?
+Well, if you think about it, only the - and | can cause loops.
+You can't have a loop with just the mirrors, because once you get back
+    around to a certain point you'd get bounced out.
+The mirrors have different behavior in different directions, but it's all symmetric.
+You can't come from two different directions and get the same output direction.
+But with - and | you can.
+
+What I'll try is breaking the full path into segments.
+A segment starts with some input point and heading,
+    continues on through the path as before,
+    but ends if it hits a wall or a - or | (regardless of direction).
+That function then returns a list of all the points it visited, and whatever
+    next steps there were (if any).
+Then we pop back out to the top-level function and start new segments
+    at whatever next steps there were from the last segment.
 """
 
 import logging
 from .util import Coord
-from collections import deque
 from collections.abc import Iterable
+from functools import cache
 
 
 PART_ONE_EXAMPLE = r"""
@@ -62,30 +84,18 @@ heading_vecs = [(-1, 0), (0, -1), (1, 0), (0, 1)]
 heading_dbg = ["N", "W", "S", "E"]
 
 
-def walk(
-    spaces: list[str],
-    start: PosHeading = ((0, 0), 3),
-    visited: dict[PosHeading, int] = None,
-) -> int:
-    num_rows = len(spaces)
-    num_cols = len(spaces[0])
-    walls = ((-1, num_rows), (-1, num_cols))
+@cache
+def walk_segment(spaces: tuple[str, ...], walls: tuple[Coord], to_visit: PosHeading):
+    """Walk until you get to a - or a |. This is cachable."""
 
-    # set of tuples of visited spaces + headings
-    visited = visited or {}
-    to_visit: deque[PosHeading] = deque((start,))
-
-    # queue of spaces to visit
-    while to_visit:
-        visit_key = to_visit.popleft()
-        space, heading = visit_key
+    all_steps = []
+    next_steps = [to_visit]
+    while len(next_steps) == 1:
+        to_visit = next_steps.pop()
+        space, heading = to_visit
         log.debug(f"Visiting {space} going {heading_dbg[heading]}")
 
-        # Mark that we've been here,
-        # but we don't know how many spaces we will see from here
-        visited[visit_key] = -1
-
-        heading_dir = heading_vecs[heading]
+        all_steps.append(to_visit)
 
         # What is in this space?
         # print(space[0], space[1], heading)
@@ -101,6 +111,7 @@ def walk(
             and not heading % 2
         ):
             log.debug("Pass through")
+            heading_dir = heading_vecs[heading]
             next_space = (space[0] + heading_dir[0], space[1] + heading_dir[1])
             potential_next_steps.append((next_space, heading))
         elif symbol == "|":
@@ -111,11 +122,11 @@ def walk(
             log.debug("Split ew")
             potential_next_steps.append(((space[0], space[1] - 1), 1))
             potential_next_steps.append(((space[0], space[1] + 1), 3))
-        else:
+        elif symbol == "/" or symbol == "\\":
             # mirror
             # \ type
             #   north -> west, west -> north, south -> east, east -> south
-            #    (-heading + 1) % 4 == [1, 0, 3, 2]
+            #   (-heading + 1) % 4 == [1, 0, 3, 2]
             # / type
             #   north -> east, west -> south, south -> west, east -> north
             #   (-heading - 1) % 4 == [3, 2, 1, 0]
@@ -131,21 +142,47 @@ def walk(
                 )
             )
 
-        # Visit next spaces
-        num_spaces_visited_from_here = 0
-        for next_visit_key in potential_next_steps:
-            next_space, next_heading = next_visit_key
+        for next_visit in potential_next_steps:
+            next_space, next_heading = next_visit
             dir_idx = next_heading % 2
-            if next_visit_key in visited:
-                # We've already been in this space heading this direction
-                # Don't need to do it again
-                log.debug(f"We've already done {next_space} going {next_heading}")
-                continue
-            elif next_space[dir_idx] in walls[dir_idx]:
+            if next_space[dir_idx] in walls[dir_idx]:
                 # This step would lead us into a wall
                 log.debug(f"Hit a wall at {next_space}")
                 continue
-            to_visit.append((next_space, next_heading))
+            next_steps.append(next_visit)
+
+        if symbol == "-" or symbol == "|":
+            break
+
+    return tuple(all_steps), tuple(next_steps) if next_steps else None
+
+
+def walk(
+    spaces: tuple[str, ...],
+    start: PosHeading = ((0, 0), 3),
+) -> int:
+    num_rows = len(spaces)
+    num_cols = len(spaces[0])
+    walls = ((-1, num_rows), (-1, num_cols))
+
+    # set of tuples of visited spaces + headings
+    visited = set()
+    to_visit_queue = [start]
+
+    # queue of spaces to visit
+    while to_visit_queue:
+        to_visit = to_visit_queue.pop()
+        log.debug(
+            f"Beginning segment walk at {to_visit[0]} "
+            f"heading {heading_dbg[to_visit[1]]}"
+        )
+        steps, next_steps = walk_segment(spaces, walls, to_visit)
+        log.debug(f"Done with segment walk. Ended at {steps[-1][0]}.")
+        visited.update(steps)
+        if next_steps:
+            for next_step in next_steps:
+                if next_step not in visited:
+                    to_visit_queue.append(next_step)
 
     # Sum up number of coords we've visited (regardless of heading)
     visited_spaces = set(map(lambda tup: tup[0], visited))
@@ -162,11 +199,11 @@ def walk(
 
 
 def part_one(lines: Iterable[str]) -> int:
-    return walk(list(lines))
+    return walk(tuple(lines))
 
 
 def part_two(lines: Iterable[str]) -> int:
-    spaces = list(lines)
+    spaces = tuple(lines)
     num_rows = len(spaces)
     num_cols = len(spaces[0])
 
