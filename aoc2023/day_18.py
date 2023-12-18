@@ -9,6 +9,10 @@ Dig out a shape, then fill in the dug out area.
 Return the area.
 
 PART 2
+The "colors" are actually the directions and distances.
+First five hex digits are distance.
+Last hex digit is color,
+0: R, 1: D, 2: L, 3: U
 """
 
 import logging
@@ -34,10 +38,9 @@ U 2 (#7a21e3)
 """
 PART_ONE_EXAMPLE_RESULT = 62
 PART_ONE_RESULT = 46334
-PART_TWO_EXAMPLE = """\
-"""
-PART_TWO_EXAMPLE_RESULT = None
-PART_TWO_RESULT = None
+PART_TWO_EXAMPLE = PART_ONE_EXAMPLE
+PART_TWO_EXAMPLE_RESULT = 952408144115
+PART_TWO_RESULT = 102000662718092
 
 
 log = logging.getLogger(__name__)
@@ -50,8 +53,7 @@ class Direction(Enum):
     R = (0, 1)
 
 
-Color = int
-
+ENCODED_DIRS = (Direction.R, Direction.D, Direction.L, Direction.U)
 
 TURNS = {
     (Direction.U, Direction.R): 1,
@@ -65,18 +67,21 @@ TURNS = {
 }
 
 
-def parse_line(line: str) -> tuple[Direction, int, Color]:
+def parse_line(line: str, is_part_two: bool = False) -> tuple[Direction, int]:
     dir_str, step_length_str, color_str = line.split()
-    return Direction[dir_str], int(step_length_str), int(color_str[2:-1], 16)
+    if is_part_two:
+        return ENCODED_DIRS[int(color_str[-2])], int(color_str[2:-2], 16)
+    else:
+        return Direction[dir_str], int(step_length_str)
 
 
-def dig_out_a_hole(directions: tuple[tuple[Direction, int, Color], ...]) -> int:
+def dig_out_a_hole(directions: tuple[tuple[Direction, int], ...]) -> int:
     is_debug = log.isEnabledFor(logging.DEBUG)
 
     start = (0, 0)
     all_vertices = []
     vertices = [start]
-    for direction, step_length, _ in directions:
+    for direction, step_length in directions:
         last_vertex = vertices[-1]
         next_vertex = (
             last_vertex[0] + direction.value[0] * step_length,
@@ -341,5 +346,5 @@ def part_one(lines: Iterable[str]) -> int:
 
 
 def part_two(lines: Iterable[str]) -> int:
-    # thing = (line for line in lines if line)
-    return -1
+    directions = tuple(parse_line(line, is_part_two=True) for line in lines)
+    return dig_out_a_hole(directions)
