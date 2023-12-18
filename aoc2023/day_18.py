@@ -55,17 +55,6 @@ class Direction(Enum):
 
 ENCODED_DIRS = (Direction.R, Direction.D, Direction.L, Direction.U)
 
-TURNS = {
-    (Direction.U, Direction.R): 1,
-    (Direction.U, Direction.L): -1,
-    (Direction.R, Direction.D): 1,
-    (Direction.R, Direction.U): -1,
-    (Direction.D, Direction.L): 1,
-    (Direction.D, Direction.R): -1,
-    (Direction.L, Direction.U): 1,
-    (Direction.L, Direction.D): -1,
-}
-
 
 def parse_line(line: str, is_part_two: bool = False) -> tuple[Direction, int]:
     dir_str, step_length_str, color_str = line.split()
