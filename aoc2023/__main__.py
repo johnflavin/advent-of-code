@@ -126,6 +126,6 @@ def main(argv):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.ERROR)
-    # logging.getLogger(__package__).setLevel(logging.DEBUG)
+    logging.getLogger(__package__).setLevel(logging.DEBUG)
     ret = main(sys.argv[1:])
     sys.exit(ret)
