@@ -20,7 +20,9 @@ SUCCESS_EMOJI = "\u2705"
 FAILURE_EMOJI = "\u274C"
 
 
-def puzzle_result_output(expected: int | str, actual: int | str) -> tuple[str, bool]:
+def puzzle_result_output(
+    expected: int | str | None, actual: int | str | None
+) -> (tuple)[str, bool]:
     correct = expected == actual
     eq = "=" if correct else "≠"
     emoji = SUCCESS_EMOJI if correct else FAILURE_EMOJI
@@ -37,16 +39,18 @@ def run_puzzle_func(day: str | int, part: Part) -> tuple[str, int]:
         if part == Part.ONE
         else puzzle_module.PART_TWO_EXAMPLE
     )
-    example = iter(raw_example.strip().split("\n"))
+    example = iter(raw_example.strip().split("\n")) if raw_example else None
     expected_example_result = (
         puzzle_module.PART_ONE_EXAMPLE_RESULT
         if part == Part.ONE
         else puzzle_module.PART_TWO_EXAMPLE_RESULT
     )
 
-    actual_example_result = puzzle_func(example)
-    example_output, example_is_correct = puzzle_result_output(
-        expected_example_result, actual_example_result
+    actual_example_result = puzzle_func(example) if example else None
+    example_output, example_is_correct = (
+        puzzle_result_output(expected_example_result, actual_example_result)
+        if actual_example_result is not None
+        else ("None provided", True)
     )
     example_output = f"Example: {example_output}"
     if not example_is_correct:
