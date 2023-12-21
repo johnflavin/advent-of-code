@@ -20,6 +20,9 @@ mypy = "^1"
 types-requests = "^2.26.1"
 ipython = "^8"
 
+[tool.poetry.group.dev.dependencies]
+matplotlib = "^3.8.2"
+
 [tool.black]
 target-version =['py311']
 
