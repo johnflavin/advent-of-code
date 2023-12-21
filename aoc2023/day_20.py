@@ -28,12 +28,25 @@ We push the button 1000 times. How many high pulses and low pulses are sent?
 Answer is the product of high and low pulses.
 
 PART 2
+How many clicks of the button will it take for node "rx" to produce a high pulse?
+
+Clearly we can't run this brute force.
+It looks like there is a single node running into "rx".
+This node gets inputs from several others.
+So it looks like we need to know when all those others will be "on" at the same time.
+I spent some time trying to figure this out theoretically, but I don't think that is
+    going to be too fruitful.
+Maybe it's possible, but I don't know if I have the time or knowledge to do that.
+Instead I'm going to assume that all the inputs upstream of that one
+    accumulator node are cyclic.
+I run the input long enough to find all their cycles, then the answer is LCM.
 """
 
 import logging
 from collections.abc import Iterable
 from collections import Counter, deque
 from enum import Enum
+from math import lcm
 from typing import Any
 
 PART_ONE_EXAMPLE = """\
@@ -125,10 +138,14 @@ class Conjunction(Module):
 
     def receive(self, pulse_level: PulseLevel, source: Module):
         self.upstream[source.name] = pulse_level
-        if all(value == PulseLevel.High for value in self.upstream.values()):
+        if self.all_high:
             self.send(PulseLevel.Low)
         else:
             self.send(PulseLevel.High)
+
+    @property
+    def all_high(self):
+        return all(value == PulseLevel.High for value in self.upstream.values())
 
     @property
     def state(self) -> ModuleState:
@@ -205,22 +222,24 @@ class Network:
         self.modules[BUTTON_NAME] = self.button
         connect_modules(self.button, self.modules[BROADCAST_NAME])
 
-    def push_button(self, num_times: int = 1):
+    def push_button(self):
+        self.button.send(PulseLevel.Low)
+        sent = []
+        log.debug("Processing pulses")
+        while self.pulse_queue:
+            pulse = self.pulse_queue.popleft()
+            pulse_level, source, destination = pulse
+            sent.append(pulse)
+            log.debug(
+                f" + {source.name} -{pulse_level.name.lower()}-> " f"{destination.name}"
+            )
+            destination.receive(pulse_level, source)
+        log.debug("Done processing pulses")
+        self.record_state(tuple(sent))
+
+    def push_button_n_times(self, num_times: int = 1):
         for push_counter in range(num_times):
-            self.button.send(PulseLevel.Low)
-            sent = []
-            log.debug("Processing pulses")
-            while self.pulse_queue:
-                pulse = self.pulse_queue.popleft()
-                pulse_level, source, destination = pulse
-                sent.append(pulse)
-                log.debug(
-                    f" + {source.name} -{pulse_level.name.lower()}-> "
-                    f"{destination.name}"
-                )
-                destination.receive(pulse_level, source)
-            log.debug("Done processing pulses")
-            self.record_state(sent)
+            self.push_button()
 
             if self.found_state_cycle():
                 # We can fast-forward our counts to where they need to be
@@ -294,7 +313,7 @@ class Network:
         else:
             total_low, total_high = 0, 0
         state = (self.state, total_low + sent_low, total_high + sent_high)
-        log.debug(f"Recording {state}")
+        # log.debug(f"Recording {state}")
         self.state_memory.append(state)
 
     def found_state_cycle(self) -> bool:
@@ -315,16 +334,51 @@ class Network:
 
         return False
 
-    def __hash__(self):
-        return hash(self.modules.values())
+    def find_upstream(self, node_name: str) -> list[Module]:
+        return [
+            module
+            for name, module in self.modules.items()
+            if any(downstream.name == node_name for downstream in module.downstream)
+        ]
+
+    def find_cycle_lengths(
+        self, nodes: list[Module], limit: int = 4096
+    ) -> dict[str, int]:
+        cycle_lengths = {node.name: -1 for node in nodes}
+        for presses in range(limit):
+            self.push_button()
+            for node in nodes:
+                if cycle_lengths[node.name] > -1:
+                    continue
+                if (
+                    isinstance(node, FlipFlop)
+                    and node.on
+                    or isinstance(node, Conjunction)
+                    and not node.all_high
+                ):
+                    cycle_lengths[node.name] = presses
+
+            if all(val > -1 for val in cycle_lengths.values()):
+                break
+
+        return cycle_lengths
 
 
 def part_one(lines: Iterable[str]) -> int:
     network = Network(lines)
-    network.push_button(1000)
+    network.push_button_n_times(1000)
     return network.total
 
 
 def part_two(lines: Iterable[str]) -> int:
-    # thing = (line for line in lines if line)
-    return -1
+    network = Network(lines)
+    accumulators = network.find_upstream("rx")
+    assert len(accumulators) == 1
+    accumulator = accumulators[0]
+    log.debug(f"Found accumulator node {accumulator}")
+    accumulator_inputs = network.find_upstream(accumulator.name)
+    log.debug(f"Found inputs to accumulator {accumulator_inputs}")
+
+    cycle_lengths = network.find_cycle_lengths(accumulator_inputs, 2**13)
+    # print(cycle_lengths)
+    return lcm(*cycle_lengths.values())
