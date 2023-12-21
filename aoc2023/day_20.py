@@ -61,9 +61,10 @@ PART_ONE_RESULT = 1020211150
 PART_TWO_EXAMPLE = """\
 """
 PART_TWO_EXAMPLE_RESULT = None
-PART_TWO_RESULT = None
+PART_TWO_RESULT = 238815727638557  # 3847*3851*4003*4027
 
 log = logging.getLogger(__name__)
+is_debug = log.isEnabledFor(logging.DEBUG)
 
 BUTTON_NAME = "button"
 BROADCAST_NAME = "broadcaster"
@@ -222,20 +223,26 @@ class Network:
         self.modules[BUTTON_NAME] = self.button
         connect_modules(self.button, self.modules[BROADCAST_NAME])
 
-    def push_button(self):
+    def push_button(self) -> PulseTrain:
         self.button.send(PulseLevel.Low)
         sent = []
-        log.debug("Processing pulses")
+        if is_debug:
+            log.debug("Processing pulses")
         while self.pulse_queue:
             pulse = self.pulse_queue.popleft()
             pulse_level, source, destination = pulse
             sent.append(pulse)
-            log.debug(
-                f" + {source.name} -{pulse_level.name.lower()}-> " f"{destination.name}"
-            )
+            if is_debug:
+                log.debug(
+                    f" + {source.name} -{pulse_level.name.lower()}-> "
+                    f"{destination.name}"
+                )
             destination.receive(pulse_level, source)
-        log.debug("Done processing pulses")
-        self.record_state(tuple(sent))
+        if is_debug:
+            log.debug("Done processing pulses")
+        sent = tuple(sent)
+        self.record_state(sent)
+        return sent
 
     def push_button_n_times(self, num_times: int = 1):
         for push_counter in range(num_times):
@@ -248,31 +255,36 @@ class Network:
                 num_cycles_to_target_idx = (
                     num_times - self.cycle_start_idx
                 ) // self.cycle_len
-                log.debug(
-                    f"Target {num_times} = "
-                    f"{num_cycles_to_target_idx}*{self.cycle_len} + "
-                    f"{self.cycle_start_idx}"
-                )
+                if is_debug:
+                    log.debug(
+                        f"Target {num_times} = "
+                        f"{num_cycles_to_target_idx}*{self.cycle_len} + "
+                        f"{self.cycle_start_idx}"
+                    )
 
                 cycle_start_low, cycle_start_high = self.state_memory[
                     self.cycle_start_idx
                 ][-2:]
-                log.debug(
-                    f"At cycle start {self.cycle_start_idx} we had sent "
-                    f"{cycle_start_low} low and {cycle_start_high} high"
-                )
+                if is_debug:
+                    log.debug(
+                        f"At cycle start {self.cycle_start_idx} we had sent "
+                        f"{cycle_start_low} low and {cycle_start_high} high"
+                    )
 
                 cycle_end_low, cycle_end_high = self.state_memory[cycle_end_idx][-2:]
-                log.debug(
-                    f"At cycle end {cycle_end_idx} we had sent "
-                    f"{cycle_end_low} low and {cycle_end_high} high"
-                )
+                if is_debug:
+                    log.debug(
+                        f"At cycle end {cycle_end_idx} we had sent "
+                        f"{cycle_end_low} low and {cycle_end_high} high"
+                    )
 
                 num_low_per_cycle = cycle_end_low - cycle_start_low
                 num_high_per_cycle = cycle_end_high - cycle_start_high
-                log.debug(
-                    f"{num_low_per_cycle} low/cycle, {num_high_per_cycle} high/cycle"
-                )
+                if is_debug:
+                    log.debug(
+                        f"{num_low_per_cycle} low/cycle, "
+                        f"{num_high_per_cycle} high/cycle"
+                    )
 
                 target_low = (
                     cycle_start_low + num_low_per_cycle * num_cycles_to_target_idx
@@ -280,16 +292,17 @@ class Network:
                 target_high = (
                     cycle_start_high + num_high_per_cycle * num_cycles_to_target_idx
                 )
-                log.debug(
-                    f"At target {num_times} we will have sent "
-                    f"{num_low_per_cycle}*{num_cycles_to_target_idx} + "
-                    f"{cycle_start_low} = {target_low} low pulses"
-                )
-                log.debug(
-                    f"At target {num_times} we will have sent {num_high_per_cycle}"
-                    f"*{num_cycles_to_target_idx} + {cycle_start_high}"
-                    f" = {target_high} high pulses"
-                )
+                if is_debug:
+                    log.debug(
+                        f"At target {num_times} we will have sent "
+                        f"{num_low_per_cycle}*{num_cycles_to_target_idx} + "
+                        f"{cycle_start_low} = {target_low} low pulses"
+                    )
+                    log.debug(
+                        f"At target {num_times} we will have sent {num_high_per_cycle}"
+                        f"*{num_cycles_to_target_idx} + {cycle_start_high}"
+                        f" = {target_high} high pulses"
+                    )
                 fake_final_state = (tuple(), target_low, target_high)
                 self.state_memory.append(fake_final_state)
                 break
@@ -313,7 +326,6 @@ class Network:
         else:
             total_low, total_high = 0, 0
         state = (self.state, total_low + sent_low, total_high + sent_high)
-        # log.debug(f"Recording {state}")
         self.state_memory.append(state)
 
     def found_state_cycle(self) -> bool:
@@ -321,15 +333,19 @@ class Network:
         for state_idx, (pulses, ltotal, htotal) in enumerate(self.state_memory[:-1]):
             if last_pulses == pulses:
                 last_state_idx = len(self.state_memory) - 1
-                log.debug(" ~~~ Found state cycle! ~~~")
-                log.debug(f" ++ State {state_idx} ({pulses}, {ltotal}, {htotal})")
-                log.debug(
-                    f" ++ State {last_state_idx} "
-                    f"({last_pulses} {last_ltotal} {last_htotal})"
-                )
+                if is_debug:
+                    log.debug(" ~~~ Found state cycle! ~~~")
+                    log.debug(f" ++ State {state_idx} ({pulses}, {ltotal}, {htotal})")
+                    log.debug(
+                        f" ++ State {last_state_idx} "
+                        f"({last_pulses} {last_ltotal} {last_htotal})"
+                    )
                 self.cycle_start_idx = state_idx
                 self.cycle_len = last_state_idx - state_idx
-                log.debug(f" + cycle len {last_state_idx}-{state_idx}={self.cycle_len}")
+                if is_debug:
+                    log.debug(
+                        f" + cycle len {last_state_idx}-{state_idx}={self.cycle_len}"
+                    )
                 return True
 
         return False
@@ -342,26 +358,33 @@ class Network:
         ]
 
     def find_cycle_lengths(
-        self, nodes: list[Module], limit: int = 4096
+        self, accumulator: Conjunction, limit: int = 4096
     ) -> dict[str, int]:
-        cycle_lengths = {node.name: -1 for node in nodes}
-        for presses in range(limit):
-            self.push_button()
-            for node in nodes:
-                if cycle_lengths[node.name] > -1:
-                    continue
-                if (
-                    isinstance(node, FlipFlop)
-                    and node.on
-                    or isinstance(node, Conjunction)
-                    and not node.all_high
-                ):
-                    cycle_lengths[node.name] = presses
+        cycles = {node_name: 0 for node_name in accumulator.upstream.keys()}
 
-            if all(val > -1 for val in cycle_lengths.values()):
+        for presses in range(1, limit + 1):
+            sent = self.push_button()
+
+            # Examine what was sent in that last press
+            # to see if the accumulator got any high signals
+            for pulse_level, source, destination in sent:
+                if (
+                    destination == accumulator
+                    and pulse_level == PulseLevel.High
+                    and not cycles[source.name]
+                ):
+                    cycles[source.name] = presses
+
+                    log.info(
+                        f" ~~ Found an input cycle! {presses} "
+                        f"{source.name} -{pulse_level.name.lower()}-> "
+                        f"{destination.name}"
+                    )
+
+            if all(cycles.values()):
                 break
 
-        return cycle_lengths
+        return cycles
 
 
 def part_one(lines: Iterable[str]) -> int:
@@ -376,9 +399,6 @@ def part_two(lines: Iterable[str]) -> int:
     assert len(accumulators) == 1
     accumulator = accumulators[0]
     log.debug(f"Found accumulator node {accumulator}")
-    accumulator_inputs = network.find_upstream(accumulator.name)
-    log.debug(f"Found inputs to accumulator {accumulator_inputs}")
 
-    cycle_lengths = network.find_cycle_lengths(accumulator_inputs, 2**13)
-    # print(cycle_lengths)
-    return lcm(*cycle_lengths.values())
+    cycles = network.find_cycle_lengths(accumulator)
+    return lcm(*cycles.values())
