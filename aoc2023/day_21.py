@@ -121,10 +121,133 @@ to try.
 I got the answer 602914405959514.
 That one also was not correct. But it was lower than my original (too high)
 answer. ...and this one was also too high!
+
+Ok, I figured out what I was missing. In my part one solution I had hard-coded that
+we would have to count spaces that are an even distance away from start.
+That isn't always the case, though. It depends on the number of steps.
+In fact, we are taking an odd number of steps in part two, so that's what we will need
+to count in part 2.
+...but that's not all! Because the length of a box is 131, which is odd,
+that means when we cross box boundaries we have to flip from even to odd or odd to even.
+Step 1: 1 odd
+Step 2: 1 odd, 4 even
+Step 3: 9 odd, 4 even
+Step 4: 9 odd, 16 even
+
+I see. So let's say we take N full steps. The number of full boxes of each type is
+N^2 and (N-1)^2, but which one is the number of even and which is the number of odd
+flips depending on whether N is even or odd.
+
+The outer edge boxes will be the opposite even/oddness of N.
+As will the 3/4 full corners.
+The 1/4 full corners will be the same even/oddness as N.
+
+Revised total:
+Our total will be...
+(odd full boxes: 131 steps, start middle) * 202300^2 +
+(even full boxes: 132 steps, start middle) * 202299^2 +
+(even 3/4 corners: 131 + 65 steps, start each corner + 1) * 202299 +
+(odd 1/4 corners: 65 steps, start each corner) * 202300 +
+(even edges: 65 steps, start middle of each edge + 1)
+
+Answer: 601441112512888
+Still too high. But I do think I'm getting closer.
+
+Rather than fill the corners, let's subtract them off.
+The number we can reach in a 3/4 full box starting from some corner is the number
+    we can reach in a full box minus what we can reach from the opposite corner.
+And since all the corners come in groups of four, we can use a 65 (or 64) step
+    box subtracted from a full box to stand in for all four of the corners.
+Ok... let's think this through.
+For a group of 4 3/4 full corners, we treat them as 4 full boxes - one all-corner box.
+And one all-corner box = 1 full box - a half box.
+So 4 3/4 full corner boxes = 3 full boxes + one half box.
+
+Similarly, four 1/4 full corners = one full box - one half box
+Make sure I respect parity here.
+
+What about edges? Opposite pairs = 2 full boxes - all-corner box = full + half
+So for all four edges, we get 2 full + 2 half boxes
+
+Let O be odd full box, o be odd half box, E full even, e half even.
+Co = O - o = odd corner, Ce = E - e = even corner
+N is number of full steps = 202300
+Total
+O * N^2 +
+E * (N-1)^2 +
+Ce * (N-1) +
+Co * N +
+2(O + o)
+Answer: 601436570105532
+Still not right. And I didn't get a "too high" or "too low".
+
+O*N^2 + 2O*N + O = O*(N+1)^2
+=> O*N^2 + O*N - o*N + 2O + 2o = O*(N+1)^2 - O*N - o*N + O + 2o
+=  O*(N+1)^2 - Co*(N+1) + o
+I don't like the leftover o. I don't think that is right.
+E*(N-1)^2 = E*N^2 - 2E*(N-1) - E
+=> E*(N-1)^2 + E*(N-1) - e*(N-1) = E*N^2 - Ce*(N-1) = E*N^2 - Ce*N + Ce
+
+Ok, I think I am off by a bit.
+The answer I have by my logic is
+O*(N+1)^2 - Co*(N+1) + E*N^2 - Ce*N + o + Ce
+I think the extra o and Ce are wrong. But I can't say why exactly.
+It just doesn't look symmetric.
+I'm going to try without.
+Using just O*(N+1)^2 - Co*(N+1) + E*N^2 - Ce*N = 601439538229138, not right
+
+Let's think about this a different way. We have this N+1 term showing up, so maybe
+it would be easier to think about the number that would be full if we went one extra
+full step.
+
+I think I've got it.
+
+On step 0 we are at even parity with start. When we take an even number of
+steps we maintain that parity.
+When we take N=202300 full steps, we are on another start with even parity.
+Therefore in the even worlds, we need to take 65 steps and land on an odd parity space.
+But when we think about the N+1 world and the corners to subtract, that is an odd
+number of full steps and therefore an odd start. We would need to take an even number
+of steps from that start to land on an odd space. So the full boxes of odd parity
+need to count the even steps.
+
+So how many boxes are there of each type? What's our formula?
+With an even N, the edge worlds are even, the 3/4 corner worlds are even,
+    but the 1/4 corner worlds are odd (meaning we want to know how far we can go in
+    from a corner in 64 steps).
+With even N*131 + 65, we have filled N^2 even boxes: E*N^2
+We want to add N 1/4 corners of each type, i.e. N odd corner boxes: Co*N
+If we were to take (N+1)*131 + 65 steps, we are in an odd parity world.
+We would have filled (N+1)^2 odd boxes: O*(N+1)^2
+But since we haven't gone that far, we have overcounted the corners on N-1 3/4 boxes.
+However, we have also overcounted the corners on the edge boxes, two of each type,
+    which makes a total of N+1 of each corner: Ce*(N+1)^2
+Our formula then is O*(N+1)^2 + E*N^2 + Co*N - Ce*(N+1)^2
+
+To find our counts we always start on start: (65, 65).
+For E we are on an even parity start and must step an odd number, so step 129
+For O we are on an odd parity start and must step an even number, so step 130
+Co = O - o is the number within 64 of a corner.
+So we must have o be the number 66 away from start.
+Ce = E - e is the number within 65 of a corner.
+So we must have e be the number 65 away from start.
+
+Answer: 601441059120658
+Incorrect, but I think I'm really really close
+Oh, wait, I had a bug. I swapped which corner type had which N. Fixed that.
+Answer: 601441025943376
+Still not correct.
+
+I think maybe my parity thinking was wrong.
+I'm going to swap odd and even and see what that does for me.
+Also I don't need to subtract the half full from the full to get the corners.
+I have all the distances, so I can directly take all points at distance > 65 from start.
+Answer: 601441063166538
+Yep, that's the one.
 """
 
 from .util import Coord
-from collections import deque
+from collections import Counter, deque
 from collections.abc import Iterable
 
 
@@ -142,44 +265,12 @@ PART_ONE_EXAMPLE = """\
 ...........
 """
 PART_ONE_EXAMPLE_RESULT = 42
-PART_ONE_RESULT = 3598  # < 3600, > 3344
-PART_TWO_EXAMPLE = """\
-.................................
-.....###.#......###.#......###.#.
-.###.##..#..###.##..#..###.##..#.
-..#.#...#....#.#...#....#.#...#..
-....#.#........#.#........#.#....
-.##...####..##...####..##...####.
-.##..#...#..##..#...#..##..#...#.
-.......##.........##.........##..
-.##.#.####..##.#.####..##.#.####.
-.##..##.##..##..##.##..##..##.##.
-.................................
-.................................
-.....###.#......###.#......###.#.
-.###.##..#..###.##..#..###.##..#.
-..#.#...#....#.#...#....#.#...#..
-....#.#........#.#........#.#....
-.##...####..##..S####..##...####.
-.##..#...#..##..#...#..##..#...#.
-.......##.........##.........##..
-.##.#.####..##.#.####..##.#.####.
-.##..##.##..##..##.##..##..##.##.
-.................................
-.................................
-.....###.#......###.#......###.#.
-.###.##..#..###.##..#..###.##..#.
-..#.#...#....#.#...#....#.#...#..
-....#.#........#.#........#.#....
-.##...####..##...####..##...####.
-.##..#...#..##..#...#..##..#...#.
-.......##.........##.........##..
-.##.#.####..##.#.####..##.#.####.
-.##..##.##..##..##.##..##..##.##.
-.................................
-"""
-PART_TWO_EXAMPLE_RESULT = 50
-PART_TWO_RESULT = None  # < 602996256135185, < 602914405959514
+PART_ONE_RESULT = 3598
+PART_TWO_EXAMPLE = PART_ONE_EXAMPLE
+PART_TWO_EXAMPLE_RESULT = 6536
+PART_TWO_EXAMPLE_STEPS = 100
+PART_TWO_EXAMPLE_EXPANSION_FACTOR = 19
+PART_TWO_RESULT = 601441063166538
 
 OFFSETS = (
     (-1, 0),
@@ -194,29 +285,25 @@ def neighbors(pt: Coord) -> Iterable[Coord]:
         yield pt[0] + row_off, pt[1] + col_off
 
 
-def walk(garden: list[str], start: Coord = None, steps: int = 64) -> int:
+def walk(garden: list[str]) -> dict[int, int]:
     num_rows = len(garden)
     num_cols = len(garden[0])
 
-    if start is None:
-        starts = [
-            (row_idx, col_idx)
-            for row_idx, line in enumerate(garden)
-            for col_idx, ch in enumerate(line)
-            if ch == "S"
-        ]
-        start = starts[0]
-    start_mod = (start[0] + start[1]) % 2
+    starts = [
+        (row_idx, col_idx)
+        for row_idx, line in enumerate(garden)
+        for col_idx, ch in enumerate(line)
+        if ch == "S"
+    ]
+    start = starts[0]
 
-    seen = set()
     dists = {}
     frontier = deque([(start, 0)])
     while frontier:
         pt, dist = frontier.popleft()
 
-        if pt in seen:
+        if pt in dists and dist >= dists[pt]:
             continue
-        seen.add(pt)
 
         if (
             not (-1 < pt[0] < num_rows and -1 < pt[1] < num_cols)
@@ -228,63 +315,68 @@ def walk(garden: list[str], start: Coord = None, steps: int = 64) -> int:
 
         frontier.extend((neighbor, dist + 1) for neighbor in neighbors(pt))
 
-    # print("Input:")
-    # print("\n".join(garden))
-    #
-    # visitable_garden = [
-    #     "".join(
-    #         "O"
-    #         if (row_idx, col_idx) in dists
-    #         and (dist := dists[(row_idx, col_idx)]) % 2 == start_mod
-    #         and dist <= 64
-    #         else ch
-    #         for col_idx, ch in enumerate(line)
-    #     )
-    #     for row_idx, line in enumerate(garden)
-    # ]
-    # print("Visitable:")
-    # visitable_str = "\n".join(visitable_garden)
-    # print(visitable_str)
-    # num_visitable = visitable_str.count("O")
-    # print("Num visitable: ", num_visitable)
+    return Counter(dists.values())
 
-    return sum(1 for dist in dists.values() if dist <= steps and dist % 2 == start_mod)
+
+def num_reachable(dists: dict[int, int], steps: int) -> int:
+    return sum(
+        count
+        for dist, count in dists.items()
+        if dist <= steps and (dist - steps) % 2 == 0
+    )
 
 
 def part_one(lines: Iterable[str]) -> int:
     garden = list(lines)
-    return walk(garden)
+    dists = walk(garden)
+    return num_reachable(dists, 64)
 
 
 def part_two(lines: Iterable[str]) -> int:
     garden = list(lines)
+    dists = walk(garden)
 
     # A hack to make my code work with the example
-    # I'm not going to use this algorithm directly as it would take
-    # practically infinite time.
+    # I want to do something a little different with the
+    #   example than I'm going to do with the real thing,
+    #   but I do still want to have a check.
     if len(garden) == PART_TWO_EXAMPLE.count("\n"):
-        return walk(garden, steps=10)
+        old_len = len(garden)
+        garden = [
+            (line * PART_TWO_EXAMPLE_EXPANSION_FACTOR).replace("S", ".")
+            for _ in range(PART_TWO_EXAMPLE_EXPANSION_FACTOR)
+            for line in garden
+        ]
+        start_pos = (old_len * PART_TWO_EXAMPLE_EXPANSION_FACTOR - 1) // 2
+        garden[start_pos] = (
+            garden[start_pos][:start_pos] + "S" + garden[start_pos][start_pos + 1 :]
+        )
+        dists = walk(garden)
+        return num_reachable(dists, steps=PART_TWO_EXAMPLE_STEPS)
 
     assert len(garden) == 131
 
     num_full_steps = 202300
 
-    full_box = walk(garden, steps=131)
-    three_quarters_full_corners = (
-        walk(garden, start=start, steps=131 + 65)
-        for start in ((0, 0), (130, 0), (0, 130), (130, 130))
+    # O: start is even parity, so step an odd number
+    odd_full_box = sum(count for dist, count in dists.items() if dist % 2 == 1)
+
+    # E: start is odd parity, so step an even number
+    even_full_box = sum(count for dist, count in dists.items() if dist % 2 == 0)
+
+    # Co: start is even parity, so step an odd number
+    odd_corners = sum(
+        count for dist, count in dists.items() if dist > 65 and dist % 2 == 1
     )
-    one_quarter_full_corners = (
-        walk(garden, start=start, steps=65)
-        for start in ((0, 0), (130, 0), (0, 130), (130, 130))
+
+    # Ce: start is odd parity, so step an even number
+    even_corners = sum(
+        count for dist, count in dists.items() if dist > 65 and dist % 2 == 0
     )
-    half_step_edges = (
-        walk(garden, start=start, steps=65)
-        for start in ((0, 65), (65, 0), (65, 130), (130, 65))
-    )
+
     return (
-        full_box * (1 + 2 * (num_full_steps - 1) * num_full_steps)
-        + sum(three_quarters_full_corners) * (num_full_steps - 1)
-        + sum(one_quarter_full_corners) * num_full_steps
-        + sum(half_step_edges)
+        odd_full_box * (num_full_steps + 1) ** 2
+        + even_full_box * num_full_steps**2
+        - odd_corners * (num_full_steps + 1)
+        + even_corners * num_full_steps
     )
