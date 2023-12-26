@@ -22,7 +22,7 @@ FAILURE_EMOJI = "\u274C"
 
 def puzzle_result_output(
     expected: int | str | None, actual: int | str | None
-) -> (tuple)[str, bool]:
+) -> tuple[str, bool]:
     correct = expected == actual
     eq = "=" if correct else "≠"
     emoji = SUCCESS_EMOJI if correct else FAILURE_EMOJI
