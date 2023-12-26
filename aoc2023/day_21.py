@@ -246,7 +246,7 @@ Answer: 601441063166538
 Yep, that's the one.
 """
 
-from .util import Coord
+from .util import neighbors
 from collections import Counter, deque
 from collections.abc import Iterable
 
@@ -271,18 +271,6 @@ PART_TWO_EXAMPLE_RESULT = 6536
 PART_TWO_EXAMPLE_STEPS = 100
 PART_TWO_EXAMPLE_EXPANSION_FACTOR = 19
 PART_TWO_RESULT = 601441063166538
-
-OFFSETS = (
-    (-1, 0),
-    (0, -1),
-    (1, 0),
-    (0, 1),
-)
-
-
-def neighbors(pt: Coord) -> Iterable[Coord]:
-    for row_off, col_off in OFFSETS:
-        yield pt[0] + row_off, pt[1] + col_off
 
 
 def walk(garden: list[str]) -> dict[int, int]:

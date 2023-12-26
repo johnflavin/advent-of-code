@@ -22,6 +22,19 @@ def revsub(one: int, two: int) -> int:
     return two - one
 
 
+OFFSETS = (
+    (-1, 0),
+    (0, -1),
+    (1, 0),
+    (0, 1),
+)
+
+
+def neighbors(pt: Coord) -> Iterable[Coord]:
+    for row_off, col_off in OFFSETS:
+        yield pt[0] + row_off, pt[1] + col_off
+
+
 class PuzzleModule(Protocol):
     PART_ONE_EXAMPLE: str
     PART_TWO_EXAMPLE: str
