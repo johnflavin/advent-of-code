@@ -12,11 +12,11 @@ pyperclip = "^1.8.2"
 networkx = "^3.2"
 
 [tool.poetry.dev-dependencies]
-black = "^23"
+black = { version = "^23", extras = ["d"] }
 pytest = "^7"
 pre-commit = "^3"
 flake8 = "^6"
-mypy = "^1"
+mypy = "^1.8"
 types-requests = "^2.26.1"
 ipython = "^8"
 
