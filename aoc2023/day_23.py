@@ -9,10 +9,11 @@ What is the longest path?
 PART 2
 Ignore slopes
 """
-import itertools
 import logging
 from .util import Coord, OFFSETS
+from collections import deque
 from collections.abc import Iterable
+from functools import cache
 
 
 PART_ONE_EXAMPLE = """\
@@ -44,7 +45,7 @@ PART_ONE_EXAMPLE_RESULT = 94
 PART_ONE_RESULT = 2182
 PART_TWO_EXAMPLE = PART_ONE_EXAMPLE
 PART_TWO_EXAMPLE_RESULT = 154
-PART_TWO_RESULT = None
+PART_TWO_RESULT = 6670
 
 
 log = logging.getLogger(__name__)
@@ -54,24 +55,25 @@ SLOPES = ("^", "<", "v", ">")
 OFFSETS_BY_SLOPE = dict(zip(SLOPES, OFFSETS))
 
 
-def find_longest_path(
+def find_path_edges(
     lines: tuple[str, ...], ignore_slopes: bool = False
-) -> tuple[Coord, ...]:
+) -> tuple[tuple[int, tuple[Coord, ...]], ...]:
     rows = len(lines)
     cols = len(lines[0])
     start = (0, lines[0].find("."))
     end = (rows - 1, lines[-1].find("."))
 
-    def longest_path_from(pt: Coord, seen: set[Coord] = None) -> tuple[Coord, ...]:
-        seen = set(seen) if seen is not None else set()
-        path = []
+    @cache
+    def find_path_segment(
+        pt: Coord, prev_point: Coord | None = None
+    ) -> tuple[Coord, int, tuple[Coord, ...]]:
+        seen = set()
+        if prev_point is not None:
+            seen.add(prev_point)
+        path_len = 1
         while True:
             if is_debug:
                 log.debug(f" + {pt}")
-            path.append(pt)
-            if pt == end:
-                log.debug(" ~~ Found the end ~~")
-                return tuple(path)
             seen.add(pt)
             current_symbol = lines[pt[0]][pt[1]]
             offsets = (
@@ -79,7 +81,7 @@ def find_longest_path(
                 if ignore_slopes or current_symbol not in SLOPES
                 else (OFFSETS_BY_SLOPE[current_symbol],)
             )
-            next_steps = [
+            next_steps: list[Coord] = [
                 (row, col)
                 for offset in offsets
                 if (
@@ -92,46 +94,49 @@ def find_longest_path(
             if len(next_steps) == 1:
                 # Just continue stepping forward
                 pt = next_steps[0]
-            elif len(next_steps) == 0:
-                # Seems this path was invalid
-                log.debug(" ++ End of path. No next steps.")
-                return tuple()
+                path_len += 1
             else:
-                # Have to make a choice
                 if is_debug:
-                    log.debug(f" ++ Recursing into next steps: {next_steps}")
-                longest_path_from_here = max(
-                    (longest_path_from(neigh, seen) for neigh in next_steps),
-                    key=lambda _path: len(_path),
-                )
-                if is_debug:
-                    log.debug(f" + Found longest path from {pt}")
-                return *path, *longest_path_from_here
+                    if not next_steps:
+                        log.debug(" ++ End of path. No next steps.")
+                    else:
+                        log.debug(f" ++ Choices: {next_steps}")
+                return pt, path_len, tuple(next_steps)
 
-    return longest_path_from(start)
+    find_path_segment.cache_clear()
+    paths = []
+    frontier: deque[tuple[int, tuple[Coord, ...], Coord]] = deque(
+        [(0, (start,), start)]
+    )
+    while frontier:
+        path_len, path, next_step = frontier.popleft()
+        prev_step = path[-1] if path[-1] != next_step else None
+        if is_debug:
+            log.debug(f"find_path_segment({next_step}, {prev_step})")
+        next_step_end_node, next_step_len, next_next_steps = find_path_segment(
+            next_step, prev_step
+        )
+        if next_step_end_node in path:
+            continue
+        path_len += next_step_len
+        path = (*path, next_step_end_node)
+        if next_step_end_node == end:
+            paths.append((path_len, path))
+            continue
+        frontier.extend((path_len, path, step) for step in next_next_steps)
+
+    return tuple(paths)
 
 
-def find_longest_path_len(lines: tuple[str, ...], ignore_slopes: bool = False) -> int:
+def find_max_path_len(lines: Iterable[str], ignore_slopes=False) -> int:
     lines = tuple(lines)
-    longest_path = find_longest_path(lines, ignore_slopes)
-    if is_debug:
-        path_pts = {}
-        for row, row_pts in itertools.groupby(longest_path, lambda pt: pt[0]):
-            if row not in path_pts:
-                path_pts[row] = set()
-            path_pts[row].update(set(pt[1] for pt in row_pts))
-
-        for row, line in enumerate(lines):
-            row_pts = path_pts.get(row, set())
-            log.debug(
-                "".join("O" if col in row_pts else ch for col, ch in enumerate(line))
-            )
-    return len(longest_path) - 1
+    paths = find_path_edges(lines, ignore_slopes)
+    return max(path_len for path_len, _ in paths) - 1
 
 
 def part_one(lines: Iterable[str]) -> int:
-    return find_longest_path_len(tuple(lines))
+    return find_max_path_len(lines)
 
 
 def part_two(lines: Iterable[str]) -> int:
-    return find_longest_path_len(tuple(lines), ignore_slopes=True)
+    return find_max_path_len(tuple(lines), ignore_slopes=True)
