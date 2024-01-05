@@ -61,6 +61,21 @@ but different numerators. However, these two must be the same.
 i and j are arbitrary labels; so long as they aren't equal they can be anything,
 so choosing i first then j must be equivalent to choosing j first then i.
 
+(Later note: I'm not so sure anymore that these are actually equivalent.
+In my prose I'm relying on being able to reassign labels, which is fine in general,
+but once you use those labels in a single expression they really aught to
+mean the same thing or you're writing nonsense. And in fact, if we do treat i as
+a particular hailstone and j as a different particular hailstone, then
+(vz-viz)/(pz-piz) = -1/ti which is definitely not equal to
+(vz-vjz)/(pz-pjz) = -1/tj. However, while I think my
+motivating reasoning is questionable at best,
+there is no fault in the algebraic manipulations.
+I'm subtracting (2) from (1), which as long as I do the same thing
+to both sides of the equation is a valid thing to do.
+I no longer know why one would want to do that, but I did it,
+and it gave me an invariant that I can use to find the answer.
+So... that's cool I guess.)
+
 What we'll do is subtract the two equations: (1) - (2).
 After expanding everything out and grouping terms (which I won't show)
 there are nice cancellations. All the vz terms go away, as do terms
