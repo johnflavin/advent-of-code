@@ -1,6 +1,6 @@
 import pytest
 
-from aoc.aoc2023 import (
+from aoc.aoc2023.util import (
     Part,
     PuzzleModule,
     get_input_file_lines,
@@ -19,7 +19,7 @@ def pytest_generate_tests(metafunc):
                 list(get_input_file_lines(day)),
                 part,
             )
-            for day in range(1, 17)
+            for day in range(1, 25)
             for part in Part
         ],
     )
