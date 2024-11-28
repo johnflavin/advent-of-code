@@ -88,7 +88,7 @@ def pretty_print(state: State):
             elif pt in state.downs:
                 line.append("v")
             else:
-                line.append(".")
+                line.append("")
         print("".join(line))
 
 
