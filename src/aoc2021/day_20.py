@@ -83,9 +83,7 @@ def apply(algo: Algo, image: Image, fill_value: int) -> Image:
             image_values = [
                 expanded[r_][c_] for r_ in range(r, r + 3) for c_ in range(c, c + 3)
             ]
-            algo_index = sum(
-                2**i * val for i, val in enumerate(reversed(image_values))
-            )
+            algo_index = sum(2**i * val for i, val in enumerate(reversed(image_values)))
             row[c] = algo[algo_index]
         new_image.append(row)
 

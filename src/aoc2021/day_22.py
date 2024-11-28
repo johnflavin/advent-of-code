@@ -95,12 +95,10 @@ PART_TWO_RESULT = 1214313344725528
 
 class Volume(ABC):
     @abstractmethod
-    def volume(self) -> int:
-        ...
+    def volume(self) -> int: ...
 
     @abstractmethod
-    def intersection(self, other: "Volume") -> "Volume":
-        ...
+    def intersection(self, other: "Volume") -> "Volume": ...
 
     def __or__(self, other: "Volume") -> "Volume":
         return Multi(self, other)

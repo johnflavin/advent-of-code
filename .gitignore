@@ -2,5 +2,7 @@ session.json
 __pycache__
 session.txt
 .vscode
-resources/inputs/
+src/resources/inputs/
 .idea/
+.ipynb_checkpoints/
+*.egg-info/
