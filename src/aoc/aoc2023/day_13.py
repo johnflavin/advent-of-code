@@ -19,8 +19,9 @@ vertically (resp. horizontally) will succeed.
 Calculate the answer the same way as before.
 """
 
-from .util import Coord
 from collections.abc import Iterable, Iterator
+
+from aoc.util import Coord
 
 
 PART_ONE_EXAMPLE = """\

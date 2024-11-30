@@ -10,10 +10,11 @@ PART 2
 Ignore slopes
 """
 import logging
-from .util import Coord, OFFSETS
 from collections import deque
 from collections.abc import Iterable
 from functools import cache
+
+from aoc.util import Coord, OFFSETS
 
 
 PART_ONE_EXAMPLE = """\

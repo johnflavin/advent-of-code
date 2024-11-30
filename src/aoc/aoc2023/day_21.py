@@ -246,9 +246,10 @@ Answer: 601441063166538
 Yep, that's the one.
 """
 
-from .util import neighbors
 from collections import Counter, deque
 from collections.abc import Iterable
+
+from aoc.util import neighbors
 
 
 PART_ONE_EXAMPLE = """\

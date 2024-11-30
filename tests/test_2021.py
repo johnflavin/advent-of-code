@@ -1,7 +1,7 @@
 import pytest
 
+from aoc.util import Part
 from aoc.aoc2021.util import (
-    Part,
     PuzzleModule,
     get_input_file_lines,
     import_puzzle_module,

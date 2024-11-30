@@ -50,9 +50,10 @@ Then we pop back out to the top-level function and start new segments
 """
 
 import logging
-from .util import Coord
 from collections.abc import Iterable
 from functools import cache
+
+from aoc.util import Coord
 
 
 PART_ONE_EXAMPLE = r"""

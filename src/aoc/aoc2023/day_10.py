@@ -69,9 +69,10 @@ Size of set is number inside.
 """
 
 import networkx as nx
-from .util import Coord
 from collections.abc import Iterable
 from networkx import Graph
+
+from aoc.util import Coord
 
 
 PART_ONE_EXAMPLE = """\

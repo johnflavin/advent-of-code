@@ -107,10 +107,11 @@ so why not just finish the job?
 """
 
 import logging
-from .util import Coord
 from collections.abc import Iterable
 from itertools import combinations
 from math import sumprod
+
+from aoc.util import Coord
 
 
 PART_ONE_EXAMPLE = """\

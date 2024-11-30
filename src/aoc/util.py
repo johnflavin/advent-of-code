@@ -29,19 +29,6 @@ class Part(Enum):
     TWO = 2
 
 
-# class PuzzleModule(Protocol):
-#     # PART_ONE_EXAMPLE: str
-#     # PART_TWO_EXAMPLE: str
-#     # PART_ONE_EXAMPLE_RESULT: int | str
-#     # PART_TWO_EXAMPLE_RESULT: int | str
-#     # PART_ONE_RESULT: int | str | None
-#     # PART_TWO_RESULT: int | str | None
-#
-#     def part_one(self, lines: Iterable[str]) -> int | str: ...
-#
-#     def part_two(self, lines: Iterable[str]) -> int | str: ...
-
-
 class YearPackage(Protocol):
     def run_puzzle_func(self, day: str | int, part: Part) -> bool: ...
 
@@ -50,11 +37,6 @@ def import_year(year: str | int) -> YearPackage:
     """Find package for the year's puzzle modules"""
     module = importlib.import_module(f"aoc.aoc{year}", package=__package__)
     return cast(YearPackage, module)
-
-
-class Part(Enum):
-    ONE = 1
-    TWO = 2
 
 
 def download_puzzle_data(year: str | int, day: str | int) -> bytes:
@@ -99,3 +81,23 @@ def get_input_file_lines(year: str | int, day: str | int) -> Iterable[str]:
             yield from f
 
     return map(lambda line: line.strip(), inner())
+
+
+type Coord = tuple[int, int]
+
+
+OFFSETS = (
+    (-1, 0),
+    (0, -1),
+    (1, 0),
+    (0, 1),
+)
+
+
+def neighbors(pt: Coord) -> Iterable[Coord]:
+    for row_off, col_off in OFFSETS:
+        yield pt[0] + row_off, pt[1] + col_off
+
+
+def revsub(one: int, two: int) -> int:
+    return two - one

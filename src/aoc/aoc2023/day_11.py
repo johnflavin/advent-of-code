@@ -24,9 +24,10 @@ If we expand empties by 10x, answer is 1030.
 If we expand by 100x, answer is 8410.
 """
 
-from .util import Coord
 from collections.abc import Iterable
 from itertools import accumulate, combinations, starmap
+
+from aoc.util import Coord
 
 
 PART_ONE_EXAMPLE = """\
