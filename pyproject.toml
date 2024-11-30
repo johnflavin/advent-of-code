@@ -26,3 +26,6 @@ dev = [
 
 [tool.black]
 target-version =['py313']
+
+[project.scripts]
+aoc = "aoc.__main__:main_cli"

@@ -36,5 +36,9 @@ def main(argv) -> int:
     return int(not run_puzzle(args.date, args.parts))
 
 
+def main_cli() -> int:
+    return main(sys.argv[1:])
+
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main_cli())
