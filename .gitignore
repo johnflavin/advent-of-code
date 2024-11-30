@@ -4,3 +4,5 @@ session.txt
 .vscode
 resources/inputs/
 .idea/
+.ipynb_checkpoints/
+*.egg-info/

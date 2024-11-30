@@ -198,12 +198,16 @@ class OrRange:
     def partition(self, value: int, gt: bool) -> tuple[Self | Range, Self | Range]:
         trues, falses = zip(_range.partition(value, gt) for _range in self.ranges)
         return (
-            OrRange(trues)
-            if not all(_range is EmptyRange for _range in trues)
-            else EmptyRange,
-            OrRange(falses)
-            if not all(_range is EmptyRange for _range in falses)
-            else EmptyRange,
+            (
+                OrRange(trues)
+                if not all(_range is EmptyRange for _range in trues)
+                else EmptyRange
+            ),
+            (
+                OrRange(falses)
+                if not all(_range is EmptyRange for _range in falses)
+                else EmptyRange
+            ),
         )
 
     @property
@@ -249,9 +253,11 @@ class Volume:
             dimensions.append(dimension)
         return OrVolume(
             tuple(
-                Volume(dims)
-                if not any(_dim == EmptyRange for _dim in dims)
-                else EmptyVolume
+                (
+                    Volume(dims)
+                    if not any(_dim == EmptyRange for _dim in dims)
+                    else EmptyVolume
+                )
                 for dims in product(*dimensions)
             )
         )

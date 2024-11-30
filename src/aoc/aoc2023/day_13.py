@@ -137,10 +137,12 @@ def find_reflection(rows: list[str], row_wise: bool, fix_smudge: bool) -> int:
 
 def run_the_thing(lines: Iterable[str], fix_smudge: bool = False) -> int:
     return sum(
-        row_refl
-        if (row_refl := find_reflection(rows, row_wise=True, fix_smudge=fix_smudge))
-        > -1
-        else find_reflection(rows, row_wise=False, fix_smudge=fix_smudge)
+        (
+            row_refl
+            if (row_refl := find_reflection(rows, row_wise=True, fix_smudge=fix_smudge))
+            > -1
+            else find_reflection(rows, row_wise=False, fix_smudge=fix_smudge)
+        )
         for rows in parse(lines)
     )
 

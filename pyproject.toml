@@ -1,27 +1,26 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools"]
+
+[project]
 name = "advent-of-code"
-version = "0.1.0"
+version = "2024.0"
 description = "Solutions to Advent of Code puzzles. https://adventofcode.com"
-authors = ["John Flavin"]
-license = "MIT"
+authors = [
+    {"name"="John Flavin"}
+]
+license = {"text" = "MIT"}
+dependencies = [
+    "requests>=2.26.0",
+    "pyperclip>=1.8.2",
+    "networkx>=3.2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-requests = "^2.26.0"
-pyperclip = "^1.8.2"
-networkx = "^3.2"
-
-[tool.poetry.dev-dependencies]
-black = { version = "^23", extras = ["d"] }
-pytest = "^7"
-ipython = "^8"
-
-[tool.poetry.group.dev.dependencies]
-matplotlib = "^3.8.2"
+[project.optional-dependencies]
+dev = [
+    "black[d]",
+    "pytest",
+    "ipython",
+]
 
 [tool.black]
-target-version =['py311']
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+target-version =['py313']

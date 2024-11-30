@@ -301,9 +301,9 @@ def match_beacons(
     #  one or just a few entries.
     # If any have 12 or more, those are the ones where we know we found
     #  an alignment.
-    scanner_transformations: dict[
-        int, dict[int, CoordinateTransformation]
-    ] = defaultdict(dict)
+    scanner_transformations: dict[int, dict[int, CoordinateTransformation]] = (
+        defaultdict(dict)
+    )
     for (s1_idx, s1_beacons), (s2_idx, s2_beacons) in combinations(
         enumerate(scanners), 2
     ):
