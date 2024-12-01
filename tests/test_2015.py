@@ -1,11 +1,7 @@
 import pytest
 
-from aoc.util import Part
-from aoc.aoc2015.util import (
-    PuzzleModule,
-    get_input_file_lines,
-    import_puzzle_module,
-)
+from aoc.util import Part, PuzzleModule
+from aoc.aoc2015 import get_input_file_lines, import_puzzle_module
 
 
 def pytest_generate_tests(metafunc):
