@@ -107,7 +107,7 @@ def run_puzzle_func(
         if actual_puzzle_result is not None:
             pyperclip.copy(actual_puzzle_result)
             log.info("Puzzle result copied to clipboard: %s", actual_puzzle_result)
-        return True
+        return None
 
     log.info(
         "Puzzle: %s", result_output_str(expected_puzzle_result, actual_puzzle_result)
