@@ -1,5 +1,3 @@
-import pytest
-
 from aoc.util import Part, PuzzleModule
 from aoc.aoc2023 import (
     get_input_file_lines,
@@ -35,8 +33,6 @@ def test_puzzle_solution(
         else puzzle_module.PART_TWO_EXAMPLE
     )
     raw_example = raw_example.strip()
-    if not raw_example:
-        pytest.skip("No example")
     example = iter(raw_example.split("\n"))
 
     expected_example_result = (
@@ -44,11 +40,9 @@ def test_puzzle_solution(
         if part == Part.ONE
         else puzzle_module.PART_TWO_EXAMPLE_RESULT
     )
-    if not expected_example_result:
-        pytest.skip("No example result")
-
-    actual_example_result = puzzle_func(example)
-    assert expected_example_result == actual_example_result
+    if expected_example_result:
+        actual_example_result = puzzle_func(example)
+        assert expected_example_result == actual_example_result
 
     expected_puzzle_result = (
         puzzle_module.PART_ONE_RESULT
