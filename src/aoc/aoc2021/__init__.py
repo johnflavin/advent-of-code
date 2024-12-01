@@ -1,1 +1,1 @@
-from aoc.aoc2021.run import run_puzzle_func
+from .run import run_puzzle_func

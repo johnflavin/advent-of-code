@@ -3,7 +3,7 @@ import logging
 import pyperclip
 
 from aoc.util import Part, result_output_str, get_input_file_lines
-from aoc.aoc2024.util import YEAR, import_puzzle_module
+from .util import YEAR, import_puzzle_module
 
 
 log = logging.getLogger(__package__)
