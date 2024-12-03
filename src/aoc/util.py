@@ -72,7 +72,7 @@ def run_puzzle_func(
         if part == Part.ONE
         else puzzle_module.PART_TWO_EXAMPLE
     )
-    example = iter(raw_example.strip().split("\n")) if raw_example else None
+    example = iter(raw_example.split("\n")) if raw_example else None
     expected_example_result = (
         puzzle_module.PART_ONE_EXAMPLE_RESULT
         if part == Part.ONE
@@ -162,7 +162,7 @@ def get_input_file_lines(year: str | int, day: str | int) -> Iterable[str]:
         with input_file.open("r") as f:
             yield from f
 
-    return map(lambda line: line.strip(), inner())
+    return map(lambda line: line.rstrip(), inner())
 
 
 type Coord = tuple[int, int]

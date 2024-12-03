@@ -29,7 +29,7 @@ def test_puzzle_solution(
         if part == Part.ONE
         else puzzle_module.PART_TWO_EXAMPLE
     )
-    raw_example = raw_example.strip()
+    raw_example = raw_example.rstrip("\n")
     example = iter(raw_example.split("\n"))
 
     expected_example_result = (
