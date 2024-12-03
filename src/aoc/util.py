@@ -2,14 +2,14 @@ import importlib
 import logging
 import os
 from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Protocol, cast
+from typing import Optional, Protocol, Self, cast
 
 import pyperclip
 import requests
 import requests.utils
-
 
 RESOURCES = Path(__package__).parent / "resources"
 INPUT_RESOURCES = RESOURCES / "inputs"
@@ -183,3 +183,58 @@ def neighbors(pt: Coord) -> Iterable[Coord]:
 
 def revsub(one: int, two: int) -> int:
     return two - one
+
+
+@dataclass(frozen=True, repr=False)
+class Range:
+    lower: int
+    upper: int
+
+    def is_empty(self) -> bool:
+        return self.lower > self.upper
+
+    def overlaps(self: Self, other: Self) -> bool:
+        return (
+            not other.is_empty()
+            and not self.is_empty()
+            and self.lower <= other.upper
+            and other.lower <= self.upper
+        )
+
+    def __and__(self: Self, other: Self) -> Self:
+        """Overlap between self and other"""
+        if not self.overlaps(other):
+            return EmptyRange
+        lower = max(self.lower, other.lower)
+        upper = min(self.upper, other.upper)
+        return Range(lower, upper)
+
+    def __sub__(self: Self, other: Self) -> list[Self]:
+        """Non-overlapping parts of self and other
+        (lower and upper). Either or both may be EmptyRange."""
+        # Non-overlapping cases
+        if other.upper < self.lower or self.upper < other.lower:
+            # Self is above or below
+            return [self]
+
+        # Some overlap exists
+        shards = []
+        if self.lower < other.lower:
+            shards.append(Range(self.lower, other.lower - 1))
+        if self.upper > other.upper:
+            shards.append(Range(other.upper + 1, self.upper))
+
+        return shards
+
+    def __contains__(self: Self, other: Self) -> bool:
+        """Other range is completely contained within self"""
+        return self.lower <= other.lower and self.upper >= other.upper
+
+    def __len__(self) -> int:
+        return self.upper - self.lower + 1
+
+    def __repr__(self):
+        return f"{self.lower},{self.upper}"
+
+
+EmptyRange = Range(0, -1)
