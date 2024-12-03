@@ -201,6 +201,9 @@ class Range:
             and other.lower <= self.upper
         )
 
+    def __iter__(self):
+        return iter(range(self.lower, self.upper + 1))
+
     def __and__(self: Self, other: Self) -> Self:
         """Overlap between self and other"""
         if not self.overlaps(other):

@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from itertools import groupby, product
 from typing import Self
 
+from aoc.util import Range
 
 PART_ONE_EXAMPLE = """\
 1,0,1~1,2,1
@@ -40,26 +41,6 @@ log = logging.getLogger(__name__)
 is_debug = log.isEnabledFor(logging.DEBUG)
 
 Vector = tuple[int, int, int]
-
-
-@dataclass(frozen=True)
-class Range:
-    lower: int
-    upper: int
-
-    def overlaps(self, other) -> bool:
-        return self.lower <= other.upper and other.lower <= self.upper
-
-    def __iter__(self):
-        return iter(range(self.lower, self.upper + 1))
-
-    def __str__(self):
-        if self.lower == self.upper:
-            return str(self.lower)
-        return f"[{self.lower}, {self.upper}]"
-
-    def __repr__(self):
-        return self.__str__()
 
 
 @dataclass(eq=False)

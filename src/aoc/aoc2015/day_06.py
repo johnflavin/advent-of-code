@@ -18,6 +18,8 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Literal, NamedTuple, Self
 
+from aoc.util import EmptyRange, Range
+
 PART_ONE_EXAMPLE = """\
 turn on 0,0 through 999,999
 toggle 0,0 through 999,0
@@ -48,55 +50,6 @@ log = logging.getLogger(__name__)
 type Instruction = Literal["turn on", "turn off", "toggle"]
 
 
-@dataclass(frozen=True, repr=False)
-class Range:
-    start: int
-    end: int
-
-    def is_empty(self) -> bool:
-        return self.start > self.end
-
-    def overlaps(self: Self, other: Self) -> bool:
-        return (
-            not other.is_empty()
-            and not self.is_empty()
-            and self.start <= other.end
-            and other.start <= self.end
-        )
-
-    def __and__(self: Self, other: Self) -> Self:
-        """Overlap between self and other"""
-        if not self.overlaps(other):
-            return EmptyRange
-        lower = max(self.start, other.start)
-        upper = min(self.end, other.end)
-        return Range(lower, upper)
-
-    def __sub__(self: Self, other: Self) -> list[Self]:
-        """Non-overlapping parts of self and other
-        (lower and upper). Either or both may be EmptyRange."""
-        # Non-overlapping cases
-        if other.end < self.start or self.end < other.start:
-            # Self is above or below
-            return [self]
-
-        # Some overlap exists
-        shards = []
-        if self.start < other.start:
-            shards.append(Range(self.start, other.start - 1))
-        if self.end > other.end:
-            shards.append(Range(other.end + 1, self.end))
-
-        return shards
-
-    def __len__(self) -> int:
-        return self.end - self.start + 1
-
-    def __repr__(self):
-        return f"{self.start},{self.end}"
-
-
-EmptyRange = Range(0, -1)
 FullRange = Range(RANGE_MIN, RANGE_MAX)
 
 
