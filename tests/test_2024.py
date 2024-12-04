@@ -16,7 +16,7 @@ def pytest_generate_tests(metafunc):
                 list(get_input_file_lines(day)),
                 part,
             )
-            for day in range(1, 4)
+            for day in range(1, 5)
             for part in Part
         ],
     )
