@@ -72,7 +72,7 @@ PART_ONE_EXAMPLE_RESULT = 46
 PART_ONE_RESULT = 6921
 PART_TWO_EXAMPLE = PART_ONE_EXAMPLE
 PART_TWO_EXAMPLE_RESULT = 51
-PART_TWO_RESULT = None
+PART_TWO_RESULT = 7594
 
 log = logging.getLogger(__name__)
 
@@ -200,11 +200,12 @@ def walk(
 
 
 def part_one(lines: Iterable[str]) -> int:
-    return walk(tuple(lines))
+    spaces = tuple(line for line in lines if line)
+    return walk(spaces)
 
 
 def part_two(lines: Iterable[str]) -> int:
-    spaces = tuple(lines)
+    spaces = tuple(line for line in lines if line)
     num_rows = len(spaces)
     num_cols = len(spaces[0])
 
