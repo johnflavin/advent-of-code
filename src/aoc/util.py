@@ -229,9 +229,30 @@ class Range:
 
         return shards
 
-    def __contains__(self: Self, other: Self) -> bool:
+    def __contains__(self: Self, other: Self | int) -> bool:
         """Other range is completely contained within self"""
-        return self.lower <= other.lower and self.upper >= other.upper
+        if isinstance(other, Range):
+            return self.lower <= other.lower and self.upper >= other.upper
+        else:
+            return self.lower <= other <= self.upper
+
+    def __lt__(self: Self, other: Self):
+        return (self.lower, self.upper) < (other.lower, other.upper)
+
+    def __le__(self: Self, other: Self):
+        return (self.lower, self.upper) <= (other.lower, other.upper)
+
+    def __gt__(self: Self, other: Self):
+        return (self.lower, self.upper) > (other.lower, other.upper)
+
+    def __ge__(self: Self, other: Self):
+        return (self.lower, self.upper) >= (other.lower, other.upper)
+
+    def __eq__(self: Self, other: Self):
+        return (self.lower, self.upper) == (other.lower, other.upper)
+
+    def __ne__(self: Self, other: Self):
+        return (self.lower, self.upper) != (other.lower, other.upper)
 
     def __len__(self) -> int:
         return self.upper - self.lower + 1
