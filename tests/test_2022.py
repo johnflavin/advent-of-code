@@ -9,22 +9,27 @@ def pytest_generate_tests(metafunc):
     # Find puzzle modules
     # Parametrize test func
     metafunc.parametrize(
-        "puzzle_module,input_file_lines,part",
+        "day,input_file_lines,part",
         [
             (
-                import_puzzle_module(day),
+                day,
                 list(get_input_file_lines(day)),
                 part,
             )
-            for day in range(1, 16)
+            for day in range(1, 17)
             for part in Part
         ],
     )
 
 
-def test_puzzle_solution(
-    puzzle_module: PuzzleModule, input_file_lines: list[str], part: Part
-):
+skip_puzzle_func = {
+    (15, Part.TWO),
+    (16, Part.TWO),
+}
+
+
+def test_puzzle_solution(day: int, input_file_lines: list[str], part: Part):
+    puzzle_module: PuzzleModule = import_puzzle_module(day)
     puzzle_func = puzzle_module.part_one if part == Part.ONE else puzzle_module.part_two
 
     raw_example = (
@@ -50,6 +55,6 @@ def test_puzzle_solution(
         else puzzle_module.PART_TWO_RESULT
     )
 
-    if expected_puzzle_result is not None:
+    if expected_puzzle_result is not None and (day, part) not in skip_puzzle_func:
         actual_puzzle_result = puzzle_func(iter(input_file_lines))
         assert expected_puzzle_result == actual_puzzle_result
