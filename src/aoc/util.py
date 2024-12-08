@@ -72,7 +72,7 @@ def run_puzzle_func(
         if part == Part.ONE
         else puzzle_module.PART_TWO_EXAMPLE
     )
-    example = iter(raw_example.split("\n")) if raw_example else None
+    example = iter(raw_example.rstrip("\n").split("\n")) if raw_example else None
     expected_example_result = (
         puzzle_module.PART_ONE_EXAMPLE_RESULT
         if part == Part.ONE
