@@ -17,7 +17,7 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterable
 
-from aoc.util import Coord
+from aoc.util import Coord, add, sub
 
 
 PART_ONE_EXAMPLE = """\
@@ -66,14 +66,6 @@ def debug_log(
 
     for y in range(max_y):
         log.debug("".join(find_symbol((x, y)) for x in range(max_x)))
-
-
-def add(a: Coord, b: Coord) -> Coord:
-    return a[0] + b[0], a[1] + b[1]
-
-
-def sub(a: Coord, b: Coord) -> Coord:
-    return a[0] - b[0], a[1] - b[1]
 
 
 def parse(lines: Iterable[str]) -> tuple[AntennaLocs, int, int]:

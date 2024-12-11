@@ -176,9 +176,17 @@ OFFSETS = (
 )
 
 
+def add(a: Coord, b: Coord) -> Coord:
+    return a[0] + b[0], a[1] + b[1]
+
+
+def sub(a: Coord, b: Coord) -> Coord:
+    return a[0] - b[0], a[1] - b[1]
+
+
 def neighbors(pt: Coord) -> Iterable[Coord]:
-    for row_off, col_off in OFFSETS:
-        yield pt[0] + row_off, pt[1] + col_off
+    for delta in OFFSETS:
+        yield add(pt, delta)
 
 
 def revsub(one: int, two: int) -> int:
