@@ -68,23 +68,18 @@ def neighbors_and_diags(pt: Coord) -> Iterable[tuple[Coord, Coord, Coord]]:
 
 
 def find_num_corners(pts: set[Coord]) -> int:
-    def is_exterior_corner(neighbor1: Coord, diag: Coord, neighbor2: Coord) -> bool:
-        """Diag and both neighbors are not in pts"""
-        return pts.isdisjoint({diag, neighbor1, neighbor2})
+    def is_exterior_corner(neighbor1: Coord, neighbor2: Coord) -> bool:
+        """Both neighbors are not in pts"""
+        return pts.isdisjoint({neighbor1, neighbor2})
 
     def is_interior_corner(neighbor1: Coord, diag: Coord, neighbor2: Coord) -> bool:
         """Diag not in pts, neighbors both are in pts"""
         return diag not in pts and {neighbor1, neighbor2} < pts
 
-    def is_skew_corner(neighbor1: Coord, diag: Coord, neighbor2: Coord) -> bool:
-        """Diag in pts, neighbors both not in pts"""
-        return diag in pts and pts.isdisjoint({neighbor1, neighbor2})
-
     return sum(
         (
-            is_exterior_corner(neighbor1, diag, neighbor2)
+            is_exterior_corner(neighbor1, neighbor2)
             or is_interior_corner(neighbor1, diag, neighbor2)
-            or is_skew_corner(neighbor1, diag, neighbor2)
         )
         for pt in pts
         for neighbor1, diag, neighbor2 in neighbors_and_diags(pt)
