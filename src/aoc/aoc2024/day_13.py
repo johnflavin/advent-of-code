@@ -78,14 +78,15 @@ def solve(a: Vec2, b: Vec2, target: Vec2, part2: bool = False) -> OpVec2:
     if det == 0:
         return None, None
 
-    # Invert the (A, B) matrix and multiply with target
-    x = (tx * by - ty * bx) / det
-    y = (-tx * ay + ty * ax) / det
+    # Invert the (A, B) matrix but don't divide by determinant yet
+    x_notscaled = tx * by - ty * bx
+    y_notscaled = -tx * ay + ty * ax
 
-    # Are solutions integers?
-    if not (x % 1 == 0 and y % 1 == 0):
+    # Are solutions integers (divisible by determinant)?
+    x, xr = divmod(x_notscaled, det)
+    y, yr = divmod(y_notscaled, det)
+    if not (xr == 0 and yr == 0):
         return None, None
-    x, y = int(x), int(y)
 
     if not part2:
         # Are solutions within bounds
