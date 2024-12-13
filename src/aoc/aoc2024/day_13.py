@@ -78,7 +78,7 @@ def solve(a: Vec2, b: Vec2, target: Vec2, part2: bool = False) -> OpVec2:
     if det == 0:
         return None, None
 
-    # Invert the (A, B) matrix
+    # Invert the (A, B) matrix and multiply with target
     x = (tx * by - ty * bx) / det
     y = (-tx * ay + ty * ax) / det
 
