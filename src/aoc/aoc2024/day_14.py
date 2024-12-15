@@ -8,10 +8,12 @@ Move everyone for 100 steps.
 Answer: multiply together count of robots in each quadrant (ignoring the middle).
 
 PART 2
+Find a step where the bots make a picture of a Christmas tree
 """
+import itertools
 import logging
 import math
-from collections import Counter
+from collections import Counter, defaultdict
 from collections.abc import Iterable
 
 
@@ -126,10 +128,25 @@ def part_two(lines: Iterable[str]) -> int:
         vx, vy = v
         return (px + t * vx) % bounds[0], (py + t * vy) % bounds[1]
 
+    def bots_in_row(bots: list[V2], n: int, is_rowwise: bool) -> bool:
+        ones = [1] * n
+        collections = defaultdict(set)
+        for x, y in bots:
+            if is_rowwise:
+                collections[y].add(x)
+            else:
+                collections[x].add(y)
+        for idx, collection in collections.items():
+            # Scan along the row looking for a run of n occupied cells
+            diffs = [b - a for a, b in itertools.pairwise(sorted(collection))]
+            if any(diffs[i : i + n] == ones for i in range(len(diffs) - n)):
+                return True
+        return False
+
     for t in range(bounds[0] * bounds[1]):
         bots = [torus_pos(p, v, t) for p, v in initial_bots]
-        grid = make_grid_str(bots, bounds)
-        if any("1111111111111111111111111111111" in grid_line for grid_line in grid):
+        if bots_in_row(bots, 20, True) and bots_in_row(bots, 20, False):
+            grid = make_grid_str(bots, bounds)
             for grid_line in grid:
                 log.info(grid_line)
             log.info("t=%d", t)
