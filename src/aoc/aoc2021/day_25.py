@@ -118,4 +118,4 @@ def part_one(lines: Iterable[str]) -> int:
 
 
 def part_two(lines: Iterable[str]) -> int:
-    return 0
+    return None
