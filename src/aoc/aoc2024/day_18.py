@@ -103,17 +103,27 @@ def part_two(lines: Iterable[str]) -> Coord:
     is_example = len(positions) <= 25
     bounds = EXAMPLE_BOUNDS if is_example else BOUNDS
 
-    num_walls = 12 if is_example else 1024
-
-    # Let the first 1024 (or 12) fall since we know from part 1 there is a path
-    walls = set(positions[:num_walls])
+    # Binary search through positions
+    # We know from part 1 that at least 1024 (or 12 for the example) walls can fall
+    # To find the minimum, let's binary search through all the positions.
+    has_path_idx = 12 if is_example else 1024
+    no_path_idx = len(positions) - 1
+    walls = set(positions[:has_path_idx])
 
     # Add wall around the edges so we aren't constantly checking in bounds
     walls.update((x, y) for x in range(0, bounds) for y in (-1, bounds))
     walls.update((x, y) for x in (-1, bounds) for y in range(0, bounds))
 
-    for byte in positions[num_walls:]:
-        walls.add(byte)
-        if walk((0, 0), (bounds - 1, bounds - 1), walls) == -1:
-            return byte
-    return -1, -1
+    while has_path_idx + 1 < no_path_idx:
+        midpoint_idx = has_path_idx + (no_path_idx - has_path_idx) // 2
+        log.debug("Testing idx=%d byte=%s", midpoint_idx, positions[midpoint_idx])
+        test_walls = {*walls, *positions[has_path_idx : midpoint_idx + 1]}
+        if walk((0, 0), (bounds - 1, bounds - 1), test_walls) == -1:
+            log.debug("No path")
+            no_path_idx = midpoint_idx
+        else:
+            log.debug("Valid path")
+            has_path_idx = midpoint_idx
+            walls = test_walls
+
+    return positions[no_path_idx]
