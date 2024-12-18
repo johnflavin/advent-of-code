@@ -189,6 +189,10 @@ def neighbors(pt: Coord) -> Iterable[Coord]:
         yield add(pt, delta)
 
 
+def manhattan_distance(a: Coord, b: Coord) -> int:
+    return abs(b[0] - a[0]) + abs(b[1] - a[1])
+
+
 def revsub(one: int, two: int) -> int:
     return two - one
 
