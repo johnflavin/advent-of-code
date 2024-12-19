@@ -180,6 +180,10 @@ def add(a: Coord, b: Coord) -> Coord:
     return a[0] + b[0], a[1] + b[1]
 
 
+def vadd(a: tuple[int, ...], b: tuple[int, ...]) -> tuple[int, ...]:
+    return tuple(map(sum, zip(a, b)))
+
+
 def sub(a: Coord, b: Coord) -> Coord:
     return a[0] - b[0], a[1] - b[1]
 
