@@ -12,6 +12,7 @@ Look for a window of 4 diffs such that the sum of the prices at the end of that 
 """
 import itertools
 import logging
+from collections import defaultdict
 from collections.abc import Iterable
 from typing import Callable
 
@@ -77,15 +78,13 @@ def find_diff_price_map(initial: int, num: int) -> dict[tuple[int, ...], int]:
 
 def part_two(lines: Iterable[str]) -> int:
     diff_price_maps = [find_diff_price_map(int(line), 2000) for line in lines]
-    all_diffs = set(itertools.chain.from_iterable(d.keys() for d in diff_price_maps))
+
+    diff_prices = defaultdict(list)
+    for d, p in itertools.chain.from_iterable(dpm.items() for dpm in diff_price_maps):
+        diff_prices[d].append(p)
     if log.isEnabledFor(logging.DEBUG):
-        max_s = -1
-        for d in all_diffs:
-            ps = [dp_map[d] for dp_map in diff_price_maps if d in dp_map]
-            s = sum(ps)
-            log.debug("%s %s = %d", ",".join(map(str, d)), " + ".join(map(str, ps)), s)
-            if s > max_s:
-                log.debug("max = %d", s)
-                max_s = s
-        return max_s
-    return max(sum(dp_map.get(d, 0) for dp_map in diff_price_maps) for d in all_diffs)
+        for d, ps in diff_prices.items():
+            log.debug(
+                "%s (%s) = %d", ",".join(map(str, d)), " + ".join(map(str, ps)), sum(ps)
+            )
+    return max(sum(ps) for ps in diff_prices.values())
