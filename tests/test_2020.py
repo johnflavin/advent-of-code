@@ -12,11 +12,11 @@ def pytest_generate_tests(metafunc):
         "day,input_file_lines,part",
         [
             (
-                day,
-                list(get_input_file_lines(day)),
+                day + 1,
+                list(get_input_file_lines(day + 1)),
                 part,
             )
-            for day in range(1, 2)
+            for day in range(2)
             for part in Part
         ],
     )
