@@ -174,6 +174,13 @@ OFFSETS = (
     (1, 0),
     (0, 1),
 )
+OFFSETS_WITH_DIAGS = (
+    *OFFSETS,
+    (1, 1),
+    (1, -1),
+    (-1, 1),
+    (-1, -1),
+)
 
 
 def add(a: Coord, b: Coord) -> Coord:
@@ -188,8 +195,9 @@ def sub(a: Coord, b: Coord) -> Coord:
     return a[0] - b[0], a[1] - b[1]
 
 
-def neighbors(pt: Coord) -> Iterable[Coord]:
-    for delta in OFFSETS:
+def neighbors(pt: Coord, diags: bool = False) -> Iterable[Coord]:
+    offsets = OFFSETS_WITH_DIAGS if diags else OFFSETS
+    for delta in offsets:
         yield add(pt, delta)
 
 
