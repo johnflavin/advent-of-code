@@ -53,7 +53,7 @@ import logging
 from collections.abc import Iterable
 from functools import cache
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = r"""
@@ -77,7 +77,7 @@ PART_TWO_RESULT = 7594
 log = logging.getLogger(__name__)
 
 
-PosHeading = tuple[Coord, int]
+PosHeading = tuple[Pt, int]
 
 
 # Heading = 0 north, 1 west, 2 south, 3 east
@@ -86,7 +86,7 @@ heading_dbg = ["N", "W", "S", "E"]
 
 
 @cache
-def walk_segment(spaces: tuple[str, ...], walls: tuple[Coord], to_visit: PosHeading):
+def walk_segment(spaces: tuple[str, ...], walls: tuple[Pt], to_visit: PosHeading):
     """Walk until you get to a - or a |. This is cachable."""
 
     all_steps = []

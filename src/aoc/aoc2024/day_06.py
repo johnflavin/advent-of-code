@@ -12,7 +12,7 @@ How many positions could you add an obstacle to cause the path to loop?
 import logging
 from collections.abc import Iterable
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -37,11 +37,11 @@ PART_TWO_RESULT = 1784
 log = logging.getLogger(__name__)
 
 
-def add(a: Coord, b: Coord) -> Coord:
+def add(a: Pt, b: Pt) -> Pt:
     return a[0] + b[0], a[1] + b[1]
 
 
-def turn_right(forward: Coord) -> Coord:
+def turn_right(forward: Pt) -> Pt:
     """Rotate a direction vector (one axis = 0, the other ±1)
     to the right.
 
@@ -54,7 +54,7 @@ def turn_right(forward: Coord) -> Coord:
     return -y, x
 
 
-def step(pos: Coord, facing: Coord, obstacles: set[Coord]) -> tuple[Coord, Coord]:
+def step(pos: Pt, facing: Pt, obstacles: set[Pt]) -> tuple[Pt, Pt]:
     """Step forward unless you hit an obstacle, then turn right
     and try again up to a total of three times. (because four tries is a circle)
     Return the next pos, forward pair."""
@@ -71,11 +71,11 @@ def step(pos: Coord, facing: Coord, obstacles: set[Coord]) -> tuple[Coord, Coord
     raise Exception("We're stuck")
 
 
-def read_grid(lines: Iterable[str]) -> tuple[Coord, Coord, set[Coord], int, int]:
+def read_grid(lines: Iterable[str]) -> tuple[Pt, Pt, set[Pt], int, int]:
     """Read the input grid. Return starting position and facing direction,
     a set of obstacle locations, and the max x and y values."""
-    start: Coord = (-1, -1)
-    facing: Coord = (0, 0)
+    start: Pt = (-1, -1)
+    facing: Pt = (0, 0)
     obstacles = set()
     max_y = 0
     x = 0
@@ -96,7 +96,7 @@ def read_grid(lines: Iterable[str]) -> tuple[Coord, Coord, set[Coord], int, int]
     return start, facing, obstacles, x + 1, max_y + 1
 
 
-def walk(pos, facing, obstacles, max_x, max_y) -> tuple[set[tuple[Coord, Coord]], bool]:
+def walk(pos, facing, obstacles, max_x, max_y) -> tuple[set[tuple[Pt, Pt]], bool]:
     history = set()
     while 0 <= pos[0] < max_x and 0 <= pos[1] < max_y and (pos, facing) not in history:
         # Record that we were here

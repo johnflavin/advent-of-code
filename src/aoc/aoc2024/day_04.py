@@ -12,7 +12,7 @@ import itertools as itt
 import logging
 from collections.abc import Iterable
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -36,7 +36,7 @@ PART_TWO_RESULT = 1992
 log = logging.getLogger(__name__)
 
 
-def add(x: Coord, y: Coord) -> Coord:
+def add(x: Pt, y: Pt) -> Pt:
     return x[0] + y[0], x[1] + y[1]
 
 
@@ -46,11 +46,11 @@ def part_one(lines: Iterable[str]) -> int:
     num_rows = len(grid)
     num_cols = len(grid[0])
 
-    def on_grid(pt: Coord) -> bool:
+    def on_grid(pt: Pt) -> bool:
         return 0 <= pt[0] < num_rows and 0 <= pt[1] < num_cols
 
     @functools.cache
-    def check_spot(pt: Coord, letter: str) -> bool:
+    def check_spot(pt: Pt, letter: str) -> bool:
         """Is this spot on the grid, and is that letter at this spot?"""
         if log.isEnabledFor(logging.DEBUG):
             og = on_grid(pt)
@@ -66,11 +66,11 @@ def part_one(lines: Iterable[str]) -> int:
                 )
         return on_grid(pt) and grid[pt[0]][pt[1]] == letter
 
-    def generate_pts(start_pt: Coord, delta: Coord, seq_len: int) -> Iterable[Coord]:
+    def generate_pts(start_pt: Pt, delta: Pt, seq_len: int) -> Iterable[Pt]:
         log.debug("Checking %s in direction %s", start_pt, delta)
         return itt.accumulate(itt.repeat(delta, seq_len - 1), add, initial=start_pt)
 
-    def check_points(pts: Iterable[Coord], letters: str) -> bool:
+    def check_points(pts: Iterable[Pt], letters: str) -> bool:
         """Check if a sequence of coords contain a sequence of letters"""
         return all(check_spot(pt, letter) for pt, letter in zip(pts, letters))
 
@@ -94,11 +94,11 @@ def part_two(lines: Iterable[str]) -> int:
     num_rows = len(grid)
     num_cols = len(grid[0])
 
-    def on_grid(pt: Coord) -> bool:
+    def on_grid(pt: Pt) -> bool:
         return 0 <= pt[0] < num_rows and 0 <= pt[1] < num_cols
 
     @functools.cache
-    def check_spot(pt: Coord, letter: str) -> bool:
+    def check_spot(pt: Pt, letter: str) -> bool:
         """Is this spot on the grid, and is that letter at this spot?"""
         if log.isEnabledFor(logging.DEBUG):
             og = on_grid(pt)
@@ -114,7 +114,7 @@ def part_two(lines: Iterable[str]) -> int:
                 )
         return on_grid(pt) and grid[pt[0]][pt[1]] == letter
 
-    def check_points(pts: Iterable[Coord], letters: str) -> bool:
+    def check_points(pts: Iterable[Pt], letters: str) -> bool:
         """Check if a sequence of coords contain a sequence of letters"""
         return all(check_spot(pt, letter) for pt, letter in zip(pts, letters))
 

@@ -12,7 +12,7 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from aoc.util import Coord, Range, EmptyRange
+from aoc.util import Pt, Range, EmptyRange
 
 
 PART_ONE_EXAMPLE = """\
@@ -54,8 +54,8 @@ SENSOR_INPUT_RE = re.compile(
 
 @dataclass
 class Sensor:
-    pos: Coord
-    nearest_beacon: Coord
+    pos: Pt
+    nearest_beacon: Pt
 
     def __post_init__(self):
         px, py = self.pos

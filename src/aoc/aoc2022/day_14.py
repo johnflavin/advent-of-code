@@ -19,7 +19,7 @@ import logging
 import math
 from collections.abc import Iterable
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -37,7 +37,7 @@ log = logging.getLogger(__name__)
 
 
 def debug_draw(
-    rocks: set[Coord], sand: set[Coord], x_min: int, x_max: int, z_max: int
+    rocks: set[Pt], sand: set[Pt], x_min: int, x_max: int, z_max: int
 ) -> None:
     if not log.isEnabledFor(logging.DEBUG):
         return
@@ -64,7 +64,7 @@ def debug_draw(
         log.debug(f"{z: >{num_z_digits}} {"".join(stuff)}")
 
 
-def parse(line: str) -> Iterable[Coord]:
+def parse(line: str) -> Iterable[Pt]:
     line_ends = [
         tuple(int(c) for c in line_end_str.split(","))
         for line_end_str in line.split(" -> ")
@@ -81,7 +81,7 @@ def parse(line: str) -> Iterable[Coord]:
     yield line_ends[-1]
 
 
-def find_rock_limits(rocks: set[Coord]) -> tuple[int, int, int]:
+def find_rock_limits(rocks: set[Pt]) -> tuple[int, int, int]:
     """Find the limits of the rocks: the max and min x values,
     and the lowest z value"""
     x_min = 500
@@ -98,8 +98,8 @@ def find_rock_limits(rocks: set[Coord]) -> tuple[int, int, int]:
 
 
 def place_sand(
-    rocks: set[Coord],
-    sand: set[Coord],
+    rocks: set[Pt],
+    sand: set[Pt],
     x_min: int,
     x_max: int,
     z_max: int,

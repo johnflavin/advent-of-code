@@ -111,7 +111,7 @@ from collections.abc import Iterable
 from itertools import combinations
 from math import sumprod
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -136,7 +136,7 @@ type Vector = tuple[int, int, int]
 
 
 def find_intersection(
-    xy0: Coord, vxvy0: Coord, xy1: Coord, vxvy1: Coord
+    xy0: Pt, vxvy0: Pt, xy1: Pt, vxvy1: Pt
 ) -> tuple[float, float, float, float] | tuple[None, None, None, None]:
     """
     X = Vt + X0 => t = (X-X0)/V

@@ -17,7 +17,7 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterable
 
-from aoc.util import Coord, add, sub
+from aoc.util import Pt, add, sub
 
 
 PART_ONE_EXAMPLE = """\
@@ -44,19 +44,19 @@ PART_TWO_RESULT = 944
 log = logging.getLogger(__name__)
 
 
-type AntennaLocs = dict[str, set[Coord]]
+type AntennaLocs = dict[str, set[Pt]]
 
 
 def debug_log(
-    antenna_locs: dict[str, set[Coord]],
-    antinode_locs: set[Coord],
+    antenna_locs: dict[str, set[Pt]],
+    antinode_locs: set[Pt],
     max_x: int,
     max_y: int,
 ) -> None:
     if not log.isEnabledFor(logging.DEBUG):
         return
 
-    def find_symbol(c: Coord) -> str:
+    def find_symbol(c: Pt) -> str:
         for antenna, locs in antenna_locs.items():
             if c in locs:
                 return antenna
@@ -88,7 +88,7 @@ def part_one(lines: Iterable[str]) -> int:
     debug_log(antenna_locs, set(), max_x, max_y)
     log.debug("-----")
 
-    def inbounds(p: Coord) -> bool:
+    def inbounds(p: Pt) -> bool:
         return 0 <= p[0] < max_x and 0 <= p[1] < max_y
 
     antinode_locs = set()
@@ -109,7 +109,7 @@ def part_two(lines: Iterable[str]) -> int:
     debug_log(antenna_locs, set(), max_x, max_y)
     log.debug("-----")
 
-    def inbounds(p: Coord) -> bool:
+    def inbounds(p: Pt) -> bool:
         return 0 <= p[0] < max_x and 0 <= p[1] < max_y
 
     antinode_locs = set()

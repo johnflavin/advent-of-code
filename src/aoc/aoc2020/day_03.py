@@ -12,7 +12,7 @@ Do part 1 for a few slopes and multiply the results
 import math
 from collections.abc import Iterable
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -35,7 +35,7 @@ PART_TWO_EXAMPLE_RESULT = 336
 PART_TWO_RESULT = 3952291680
 
 
-def parse(lines: Iterable[str]) -> tuple[int, int, set[Coord]]:
+def parse(lines: Iterable[str]) -> tuple[int, int, set[Pt]]:
     trees = set()
     max_x = 0
     max_y = 0
@@ -50,7 +50,7 @@ def parse(lines: Iterable[str]) -> tuple[int, int, set[Coord]]:
     return max_x, max_y, trees
 
 
-def count_tree_hits(slope: Coord, max_x: int, max_y: int, trees: set[Coord]) -> int:
+def count_tree_hits(slope: Pt, max_x: int, max_y: int, trees: set[Pt]) -> int:
     pt = (0, 0)
     hit = 0
     while pt[1] < max_y:

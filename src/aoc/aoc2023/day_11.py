@@ -27,7 +27,7 @@ If we expand by 100x, answer is 8410.
 from collections.abc import Iterable
 from itertools import accumulate, combinations, starmap
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -49,7 +49,7 @@ PART_TWO_EXAMPLE_RESULT = 82000210
 PART_TWO_RESULT = 553083047914
 
 
-def parse(lines: Iterable[str], expansion_factor: int = 2) -> list[Coord]:
+def parse(lines: Iterable[str], expansion_factor: int = 2) -> list[Pt]:
     # Find galaxies
     coords = []
     unoccupied_rows = []
@@ -79,7 +79,7 @@ def parse(lines: Iterable[str], expansion_factor: int = 2) -> list[Coord]:
     return coords
 
 
-def distance(coord1: Coord, coord2: Coord) -> int:
+def distance(coord1: Pt, coord2: Pt) -> int:
     return abs(coord2[0] - coord1[0]) + abs(coord2[1] - coord1[1])
 
 

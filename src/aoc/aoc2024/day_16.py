@@ -14,7 +14,7 @@ import heapq
 import logging
 from collections.abc import Iterable
 
-from aoc.util import Coord, add, sub
+from aoc.util import Pt, add, sub
 
 
 PART_ONE_EXAMPLE = """\
@@ -51,17 +51,17 @@ is_debug = log.isEnabledFor(logging.DEBUG)
 # S = (0, 1)
 
 
-def rotate_cw(pt: Coord) -> Coord:
+def rotate_cw(pt: Pt) -> Pt:
     return -pt[1], pt[0]
 
 
-def rotate_ccw(pt: Coord) -> Coord:
+def rotate_ccw(pt: Pt) -> Pt:
     return pt[1], -pt[0]
 
 
-def walk(start: Coord, end: Coord, walls: set[Coord], part1: bool = True) -> int:
+def walk(start: Pt, end: Pt, walls: set[Pt], part1: bool = True) -> int:
 
-    def heuristic(pt: Coord, facing: Coord) -> int:
+    def heuristic(pt: Pt, facing: Pt) -> int:
         diff = sub(end, pt)
         steps = abs(diff[0]) + abs(diff[1])
         match diff, facing:
@@ -141,7 +141,7 @@ def walk(start: Coord, end: Coord, walls: set[Coord], part1: bool = True) -> int
 
 
 def part_one(lines: Iterable[str]) -> int:
-    def parse(lines: Iterable[str]) -> tuple[Coord, Coord, set[Coord]]:
+    def parse(lines: Iterable[str]) -> tuple[Pt, Pt, set[Pt]]:
         start = (-1, -1)
         end = (-1, -1)
         walls = set()
@@ -161,7 +161,7 @@ def part_one(lines: Iterable[str]) -> int:
 
 
 def part_two(lines: Iterable[str]) -> int:
-    def parse(lines: Iterable[str]) -> tuple[Coord, Coord, set[Coord]]:
+    def parse(lines: Iterable[str]) -> tuple[Pt, Pt, set[Pt]]:
         start = (-1, -1)
         end = (-1, -1)
         walls = set()

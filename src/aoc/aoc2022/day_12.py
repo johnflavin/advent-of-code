@@ -15,7 +15,7 @@ Find shortest path from any starting point at elevation a
 from collections import deque
 from collections.abc import Iterable
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -35,11 +35,11 @@ PART_TWO_RESULT = 459
 a = ord("a")
 
 
-def add(x: Coord, y: Coord) -> Coord:
+def add(x: Pt, y: Pt) -> Pt:
     return x[0] + y[0], x[1] + y[1]
 
 
-def walk(start: Coord, end: Coord, grid) -> list[Coord]:
+def walk(start: Pt, end: Pt, grid) -> list[Pt]:
     num_rows = len(grid)
     num_cols = len(grid[0])
 
@@ -84,8 +84,8 @@ def walk(start: Coord, end: Coord, grid) -> list[Coord]:
 
 def part_one(lines: Iterable[str]) -> int:
     grid = []
-    start: Coord = (-1, -1)
-    end: Coord = (-1, -1)
+    start: Pt = (-1, -1)
+    end: Pt = (-1, -1)
     for r, line in enumerate(lines):
         if not line:
             continue
@@ -106,8 +106,8 @@ def part_one(lines: Iterable[str]) -> int:
 
 def part_two(lines: Iterable[str]) -> int:
     grid = []
-    starts: list[Coord] = []
-    end: Coord = (-1, -1)
+    starts: list[Pt] = []
+    end: Pt = (-1, -1)
     for r, line in enumerate(lines):
         if not line:
             continue

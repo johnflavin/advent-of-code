@@ -18,7 +18,7 @@ import logging
 from collections.abc import Iterable
 from functools import cache
 
-from aoc.util import Coord, neighbors
+from aoc.util import Pt, neighbors
 
 
 PART_ONE_EXAMPLE = """\
@@ -52,7 +52,7 @@ def part_one(lines: Iterable[str]) -> int:
         return 0 <= r < rows and 0 <= c < cols
 
     @cache
-    def find_nines(r: int, c: int) -> set[Coord]:
+    def find_nines(r: int, c: int) -> set[Pt]:
         """How many 9s can we reach from here?"""
         val = grid[r][c]
 

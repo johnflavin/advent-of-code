@@ -21,7 +21,7 @@ Calculate the answer the same way as before.
 
 from collections.abc import Iterable, Iterator
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -66,7 +66,7 @@ def parse(lines: Iterable[str]) -> Iterator[list[str]]:
         # print("---")
 
 
-def flip(row: str, coord: Coord) -> str:
+def flip(row: str, coord: Pt) -> str:
     prefix = row[: coord[1]] if coord[1] > 0 else ""
     entry = "." if row[coord[1]] == "#" else "#"
     suffix = row[coord[1] + 1 :] if coord[1] < len(row) - 1 else ""

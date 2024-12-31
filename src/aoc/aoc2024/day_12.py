@@ -27,7 +27,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 
-from aoc.util import Coord, neighbors, add
+from aoc.util import Pt, neighbors, add
 
 PART_ONE_EXAMPLE = """\
 RRRRIICCFF
@@ -51,11 +51,11 @@ PART_TWO_RESULT = 898684
 log = logging.getLogger(__name__)
 
 
-def perimeter(pts: set[Coord]) -> int:
+def perimeter(pts: set[Pt]) -> int:
     return sum(4 - sum(1 for n in neighbors(pt) if n in pts) for pt in pts)
 
 
-def neighbors_and_diags(pt: Coord) -> Iterable[tuple[Coord, Coord, Coord]]:
+def neighbors_and_diags(pt: Pt) -> Iterable[tuple[Pt, Pt, Pt]]:
     """Return an iterable of each diagonal along with its two adjacent neighbors"""
     add_p = functools.partial(add, pt)
     for trio in (
@@ -67,12 +67,12 @@ def neighbors_and_diags(pt: Coord) -> Iterable[tuple[Coord, Coord, Coord]]:
         yield tuple(map(add_p, trio))
 
 
-def find_num_corners(pts: set[Coord]) -> int:
-    def is_exterior_corner(neighbor1: Coord, neighbor2: Coord) -> bool:
+def find_num_corners(pts: set[Pt]) -> int:
+    def is_exterior_corner(neighbor1: Pt, neighbor2: Pt) -> bool:
         """Both neighbors are not in pts"""
         return pts.isdisjoint({neighbor1, neighbor2})
 
-    def is_interior_corner(neighbor1: Coord, diag: Coord, neighbor2: Coord) -> bool:
+    def is_interior_corner(neighbor1: Pt, diag: Pt, neighbor2: Pt) -> bool:
         """Diag not in pts, neighbors both are in pts"""
         return diag not in pts and {neighbor1, neighbor2} < pts
 
@@ -86,13 +86,13 @@ def find_num_corners(pts: set[Coord]) -> int:
     )
 
 
-def num_sides(pts: set[Coord]) -> int:
+def num_sides(pts: set[Pt]) -> int:
     return find_num_corners(pts)
 
 
 @dataclass
 class Area:
-    pts: set[Coord] = field(default_factory=set)
+    pts: set[Pt] = field(default_factory=set)
 
     @property
     def perimeter(self):
@@ -115,11 +115,11 @@ class Area:
         return self.area * self.num_sides
 
 
-def flood_fill(seed: Coord, grid: list[str]) -> Area:
+def flood_fill(seed: Pt, grid: list[str]) -> Area:
     max_r = len(grid)
     max_c = len(grid[0])
 
-    def inbounds(a: Coord) -> bool:
+    def inbounds(a: Pt) -> bool:
         return 0 <= a[0] < max_r and 0 <= a[1] < max_c
 
     area = Area()

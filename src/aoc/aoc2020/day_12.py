@@ -12,7 +12,7 @@ NSEW move the heading instead of the ship.
 import logging
 from collections.abc import Iterable
 
-from aoc.util import Coord, add
+from aoc.util import Pt, add
 
 PART_ONE_EXAMPLE = """\
 F10
@@ -45,7 +45,7 @@ def parse(lines: Iterable[str]) -> Iterable[Instruction]:
         yield line[0], int(line[1:])
 
 
-def rotate(heading: Coord, direction: str, units: int) -> Coord:
+def rotate(heading: Pt, direction: str, units: int) -> Pt:
     if units == 0:
         return heading
     elif units == 180:
@@ -59,8 +59,8 @@ def rotate(heading: Coord, direction: str, units: int) -> Coord:
 
 
 def move(
-    pos: Coord, heading: Coord, direction: str, units: int, part1: bool = True
-) -> tuple[Coord, Coord]:
+    pos: Pt, heading: Pt, direction: str, units: int, part1: bool = True
+) -> tuple[Pt, Pt]:
     delta = heading if direction == "F" else DIRECTIONS[direction]
     if part1 or direction == "F":
         return add(pos, (units * delta[0], units * delta[1])), heading
@@ -69,7 +69,7 @@ def move(
 
 
 def run_instructions(
-    lines: Iterable[str], pos: Coord, heading: Coord, part1: bool = True
+    lines: Iterable[str], pos: Pt, heading: Pt, part1: bool = True
 ) -> int:
     log.debug("Start: pos=%s heading=%s", pos, heading)
     for direction, units in parse(lines):

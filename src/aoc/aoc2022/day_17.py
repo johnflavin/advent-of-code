@@ -25,7 +25,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import partial
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 PART_ONE_EXAMPLE = """\
 >>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>
@@ -41,24 +41,24 @@ log = logging.getLogger(__name__)
 is_debug = log.isEnabledFor(logging.DEBUG)
 
 
-def add(a: Coord, b: Coord) -> Coord:
+def add(a: Pt, b: Pt) -> Pt:
     return a[0] + b[0], a[1] + b[1]
 
 
-def sub(a: Coord, b: Coord) -> Coord:
+def sub(a: Pt, b: Pt) -> Pt:
     return a[0] - b[0], a[1] - b[1]
 
 
 @dataclass
 class Shape:
-    anchor: Coord
-    extents: tuple[Coord, ...]
+    anchor: Pt
+    extents: tuple[Pt, ...]
 
     def __iter__(self):
         for e in self.extents:
             yield add(self.anchor, e)
 
-    def __contains__(self, item: Coord) -> bool:
+    def __contains__(self, item: Pt) -> bool:
         return item in set(self)
 
 
@@ -111,7 +111,7 @@ MOVES = {
 }
 
 
-def debug_log(rocks: set[Coord], next_shape: Shape, width: int) -> None:
+def debug_log(rocks: set[Pt], next_shape: Shape, width: int) -> None:
     if not is_debug:
         return
     log.debug("")
@@ -142,7 +142,7 @@ def do_the_thing(
     jet_seq: str,
     jet_start_idx: int = 0,
     shape_start_idx: int = 0,
-    rocks: set[Coord] = None,
+    rocks: set[Pt] = None,
 ) -> int:
     width = 7
     rocks = {(x, 0) for x in range(width)} if rocks is None else rocks
@@ -153,7 +153,7 @@ def do_the_thing(
     def in_walls(s: Shape) -> bool:
         return not all(0 <= x < width for x, y in s)
 
-    def move(s: Shape, m: Coord) -> bool:
+    def move(s: Shape, m: Pt) -> bool:
         """Try moving a shape. If it was invalid, undo it.
         Return whether we did the move or not."""
         s.anchor = add(s.anchor, m)
@@ -192,7 +192,7 @@ def do_the_thing2(
     jet_seq: str,
     jet_start_idx: int = 0,
     shape_start_idx: int = 0,
-    rocks: set[Coord] = None,
+    rocks: set[Pt] = None,
 ) -> int:
 
     rocks = {0: 0b1111111}

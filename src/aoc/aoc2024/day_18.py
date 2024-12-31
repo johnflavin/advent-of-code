@@ -8,7 +8,7 @@ import heapq
 import logging
 from collections.abc import Iterable
 
-from aoc.util import Coord, neighbors, manhattan_distance
+from aoc.util import Pt, neighbors, manhattan_distance
 
 
 PART_ONE_EXAMPLE = """\
@@ -50,14 +50,14 @@ log = logging.getLogger(__name__)
 is_debug = log.isEnabledFor(logging.DEBUG)
 
 
-def draw_grid(walls: set[Coord], bounds: int) -> None:
+def draw_grid(walls: set[Pt], bounds: int) -> None:
     if not is_debug:
         return
     for y in range(bounds):
         log.debug("".join("#" if (x, y) in walls else "." for x in range(bounds)))
 
 
-def walk(start: Coord, end: Coord, walls: set[Coord]) -> int:
+def walk(start: Pt, end: Pt, walls: set[Pt]) -> int:
     # (estimated steps to end, actual steps so far, pt)
     frontier = [(0, 0, start)]
     visited = set()
@@ -83,7 +83,7 @@ def walk(start: Coord, end: Coord, walls: set[Coord]) -> int:
 
 
 def part_one(lines: Iterable[str]) -> int:
-    positions: list[Coord] = [tuple(map(int, line.split(","))) for line in lines]
+    positions: list[Pt] = [tuple(map(int, line.split(","))) for line in lines]
     is_example = len(positions) <= 25
     bounds = EXAMPLE_BOUNDS if is_example else BOUNDS
     num_walls = 12 if is_example else 1024
@@ -98,8 +98,8 @@ def part_one(lines: Iterable[str]) -> int:
     return walk((0, 0), (bounds - 1, bounds - 1), walls)
 
 
-def part_two(lines: Iterable[str]) -> Coord:
-    positions: list[Coord] = [tuple(map(int, line.split(","))) for line in lines]
+def part_two(lines: Iterable[str]) -> Pt:
+    positions: list[Pt] = [tuple(map(int, line.split(","))) for line in lines]
     is_example = len(positions) <= 25
     bounds = EXAMPLE_BOUNDS if is_example else BOUNDS
 

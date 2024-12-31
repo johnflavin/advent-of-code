@@ -13,7 +13,7 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterable
 
-from aoc.util import Coord, neighbors, add
+from aoc.util import Pt, neighbors, add
 
 
 PART_ONE_EXAMPLE = """\
@@ -51,14 +51,14 @@ PART_TWO_RESULT = 6670
 log = logging.getLogger(__name__)
 is_debug = log.isEnabledFor(logging.DEBUG)
 
-type Slopes = dict[Coord, Coord]
+type Slopes = dict[Pt, Pt]
 
 SLOPES = ("^", "<", "v", ">")
 OFFSETS_BY_SLOPE = {"^": (0, -1), "<": (-1, 0), "v": (0, 1), ">": (1, 0)}
 NO_SLOPE = (0, 0)
 
 
-def parse_lines(lines: Iterable[str]) -> tuple[Coord, Coord, set[Coord], Slopes]:
+def parse_lines(lines: Iterable[str]) -> tuple[Pt, Pt, set[Pt], Slopes]:
     walls = set()
     slopes = {}
     for y, line in enumerate(lines):
@@ -78,7 +78,7 @@ def parse_lines(lines: Iterable[str]) -> tuple[Coord, Coord, set[Coord], Slopes]
     return start, end, walls, slopes
 
 
-def walk(start: Coord, end: Coord, walls: set[Coord], slopes: Slopes) -> int:
+def walk(start: Pt, end: Pt, walls: set[Pt], slopes: Slopes) -> int:
     """
     Here's what we want to do.
     Build a small graph of start, end, and "branch points":

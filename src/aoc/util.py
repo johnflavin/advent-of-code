@@ -165,7 +165,7 @@ def get_input_file_lines(year: str | int, day: str | int) -> Iterable[str]:
     return map(lambda line: line.rstrip(), inner())
 
 
-type Coord = tuple[int, int]
+type Pt = tuple[int, int]
 
 
 OFFSETS = (
@@ -183,7 +183,7 @@ OFFSETS_WITH_DIAGS = (
 )
 
 
-def add(a: Coord, b: Coord) -> Coord:
+def add(a: Pt, b: Pt) -> Pt:
     return a[0] + b[0], a[1] + b[1]
 
 
@@ -191,17 +191,17 @@ def vadd(a: tuple[int, ...], b: tuple[int, ...]) -> tuple[int, ...]:
     return tuple(map(sum, zip(a, b)))
 
 
-def sub(a: Coord, b: Coord) -> Coord:
+def sub(a: Pt, b: Pt) -> Pt:
     return a[0] - b[0], a[1] - b[1]
 
 
-def neighbors(pt: Coord, diags: bool = False) -> Iterable[Coord]:
+def neighbors(pt: Pt, diags: bool = False) -> Iterable[Pt]:
     offsets = OFFSETS_WITH_DIAGS if diags else OFFSETS
     for delta in offsets:
         yield add(pt, delta)
 
 
-def manhattan_distance(a: Coord, b: Coord) -> int:
+def manhattan_distance(a: Pt, b: Pt) -> int:
     return abs(b[0] - a[0]) + abs(b[1] - a[1])
 
 

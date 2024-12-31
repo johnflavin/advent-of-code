@@ -13,7 +13,7 @@ Now we have to expand the map. Boxes take up two spaces in a row.
 import logging
 from collections.abc import Iterable
 
-from aoc.util import Coord, add
+from aoc.util import Pt, add
 
 
 PART_ONE_EXAMPLE = """\
@@ -61,20 +61,20 @@ log = logging.getLogger(__name__)
 is_debug = log.isEnabledFor(logging.DEBUG)
 
 
-type Robot = Coord
-type Box = Coord
+type Robot = Pt
+type Box = Pt
 type Boxes = set[Box]
-type Walls = set[Coord]
-type Move = Coord
+type Walls = set[Pt]
+type Move = Pt
 type Moves = tuple[Move, ...]
 
-move_map: dict[str, Coord] = {
+move_map: dict[str, Pt] = {
     ">": (1, 0),
     "<": (-1, 0),
     "^": (0, -1),
     "v": (0, 1),
 }
-rev_move_map: dict[Coord, str] = {
+rev_move_map: dict[Pt, str] = {
     (1, 0): ">",
     (-1, 0): "<",
     (0, -1): "^",

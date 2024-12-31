@@ -17,7 +17,7 @@ Apply rules until nothing changes. How many occupied seats?
 import logging
 from collections.abc import Iterable
 
-from aoc.util import Coord, neighbors, OFFSETS_WITH_DIAGS, add
+from aoc.util import Pt, neighbors, OFFSETS_WITH_DIAGS, add
 
 
 PART_ONE_EXAMPLE = """\
@@ -41,7 +41,7 @@ PART_TWO_RESULT = 2131
 log = logging.getLogger(__name__)
 is_debug = log.isEnabledFor(logging.DEBUG)
 
-type Coords = set[Coord]
+type Coords = set[Pt]
 
 
 def parse(lines: Iterable[str]) -> tuple[Coords, Coords, int, int]:
@@ -92,10 +92,10 @@ def part_one(lines: Iterable[str]) -> int:
 def part_two(lines: Iterable[str]) -> int:
     occupied, unoccupied, max_x, max_y = parse(lines)
 
-    def inbounds(pt: Coord) -> bool:
+    def inbounds(pt: Pt) -> bool:
         return 0 <= pt[0] < max_x and 0 <= pt[1] < max_y
 
-    def first_seat(pt: Coord, delta: Coord) -> Coord:
+    def first_seat(pt: Pt, delta: Pt) -> Pt:
         while inbounds(pt := add(pt, delta)):
             if pt in occupied or pt in unoccupied:
                 return pt

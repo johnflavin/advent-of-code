@@ -72,7 +72,7 @@ import networkx as nx
 from collections.abc import Iterable
 from networkx import Graph
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -104,7 +104,7 @@ DIST = "distance"
 VISITED = "visited"
 
 
-def parse(lines: Iterable[str]) -> tuple[Graph, Coord]:
+def parse(lines: Iterable[str]) -> tuple[Graph, Pt]:
     graph = Graph()
     start = None
     for row, line in enumerate(lines):

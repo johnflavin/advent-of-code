@@ -9,7 +9,7 @@ Cheats can go up to 20 steps
 """
 from collections.abc import Iterable
 
-from aoc.util import Coord, neighbors
+from aoc.util import Pt, neighbors
 
 
 PART_ONE_EXAMPLE = """\
@@ -39,9 +39,7 @@ PART_TWO_EXAMPLE_THRESHOLD = 50
 PART_TWO_RESULT = 1017615
 
 
-def find_dist_from_start(
-    start: Coord, end: Coord, walls: set[Coord]
-) -> dict[Coord, int]:
+def find_dist_from_start(start: Pt, end: Pt, walls: set[Pt]) -> dict[Pt, int]:
     dist_from_start = {start: 0}
     pt = start
     while pt != end:
@@ -53,7 +51,7 @@ def find_dist_from_start(
     return dist_from_start
 
 
-def parse(lines: Iterable[str]) -> tuple[Coord, Coord, set[Coord]]:
+def parse(lines: Iterable[str]) -> tuple[Pt, Pt, set[Pt]]:
     start = (-1, -1)
     end = (-1, -1)
     walls = set()

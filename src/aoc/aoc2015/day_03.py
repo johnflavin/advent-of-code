@@ -13,7 +13,7 @@ How many unique points are visited?
 import itertools
 from collections.abc import Iterable
 
-from aoc.util import Coord
+from aoc.util import Pt
 
 
 PART_ONE_EXAMPLE = """\
@@ -28,7 +28,7 @@ PART_TWO_EXAMPLE_RESULT = 11
 PART_TWO_RESULT = 2631
 
 
-def follow_directions(directions: Iterable[str]) -> set[Coord]:
+def follow_directions(directions: Iterable[str]) -> set[Pt]:
     points = [(0, 0)]
     for ch in directions:
         point = points[-1]
