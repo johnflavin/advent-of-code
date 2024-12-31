@@ -1,5 +1,5 @@
 from aoc.util import Part, PuzzleModule
-from aoc.aoc2022 import (
+from aoc.aoc2020 import (
     get_input_file_lines,
     import_puzzle_module,
 )
