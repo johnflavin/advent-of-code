@@ -7,6 +7,7 @@ from aoc.testing.util import generate_pytest_generate_tests
 
 marks = {
     (15, Part.TWO): pytest.mark.skip("Takes too long"),
+    (23, Part.TWO): pytest.mark.skip("Takes too long"),
 }
 
-pytest_generate_tests = generate_pytest_generate_tests(marks, 22)
+pytest_generate_tests = generate_pytest_generate_tests(marks, 23)
