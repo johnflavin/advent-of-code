@@ -9,7 +9,6 @@ up to 1 million.
 And we need to do 10 million moves, not just 100.
 Multiply the two values clockwise of 1.
 """
-import logging
 from collections.abc import Iterable
 
 
@@ -22,8 +21,8 @@ PART_TWO_EXAMPLE = PART_ONE_EXAMPLE
 PART_TWO_EXAMPLE_RESULT = 149245887792
 PART_TWO_RESULT = 286194102744
 
-log = logging.getLogger(__name__)
-is_debug = log.isEnabledFor(logging.DEBUG)
+# log = logging.getLogger(__name__)
+# is_debug = log.isEnabledFor(logging.DEBUG)
 
 
 def do_moves_but_fast_this_time(given_nums: list[int], moves: int) -> dict[int, int]:
@@ -33,21 +32,21 @@ def do_moves_but_fast_this_time(given_nums: list[int], moves: int) -> dict[int, 
     num_pointers = dict(zip(given_nums, given_nums[1:] + [given_nums[0]]))
     active = given_nums[0]
 
-    for m in range(moves):
-        if is_debug:
-            log.debug("-- move %d --", m + 1)
-            the_rest = []
-            next_num = active
-            while (next_num := num_pointers[next_num]) != active:
-                the_rest.append(next_num)
-            log.debug("cups: (%d) %s", active, " ".join(map(str, the_rest)))
+    for _ in range(moves):
+        # if is_debug:
+        #     log.debug("-- move %d --", m + 1)
+        #     the_rest = []
+        #     next_num = active
+        #     while (next_num := num_pointers[next_num]) != active:
+        #         the_rest.append(next_num)
+        #     log.debug("cups: (%d) %s", active, " ".join(map(str, the_rest)))
 
         # "Pick up" three next to active
         hold = [num_pointers[active]]
         hold.append(num_pointers[hold[-1]])
         hold.append(num_pointers[hold[-1]])
-        if is_debug:
-            log.debug("pick up: %s", " ".join(map(str, hold)))
+        # if is_debug:
+        #     log.debug("pick up: %s", " ".join(map(str, hold)))
 
         # Bridge the gap we made by picking these up
         num_pointers[active] = num_pointers[hold[-1]]
@@ -60,7 +59,7 @@ def do_moves_but_fast_this_time(given_nums: list[int], moves: int) -> dict[int, 
             dest = (dest - 1) % max_val
             if dest == 0:
                 dest = max_val
-        log.debug("destination: %d", dest)
+        # log.debug("destination: %d", dest)
 
         # Re-insert held items
         num_pointers[hold[-1]] = num_pointers[dest]
@@ -69,7 +68,7 @@ def do_moves_but_fast_this_time(given_nums: list[int], moves: int) -> dict[int, 
         # Move active to next in the chain
         active = num_pointers[active]
 
-        log.debug("")
+        # log.debug("")
     return num_pointers
 
 
