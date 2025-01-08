@@ -10,4 +10,4 @@ marks = {
     (23, Part.TWO): pytest.mark.skip("Takes too long"),
 }
 
-pytest_generate_tests = generate_pytest_generate_tests(marks, 24)
+pytest_generate_tests = generate_pytest_generate_tests(marks, 25)
