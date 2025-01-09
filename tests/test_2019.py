@@ -4,4 +4,4 @@ from aoc.testing.util import generate_pytest_generate_tests
 
 marks = {}
 
-pytest_generate_tests = generate_pytest_generate_tests(marks, 4)
+pytest_generate_tests = generate_pytest_generate_tests(marks, 5)
