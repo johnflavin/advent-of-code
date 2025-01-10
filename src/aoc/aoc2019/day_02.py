@@ -28,19 +28,19 @@ PART_TWO_RESULT = 6421
 def part_one(lines: Iterable[str]) -> int:
     program = [int(i) for i in "".join(lines).split(",")]
     ic = Intcode(program)
-    ic.memory[1] = 12
-    ic.memory[2] = 2
+    ic.mem[1] = 12
+    ic.mem[2] = 2
     ic.run()
-    return ic.memory[0]
+    return ic.mem[0]
 
 
 def part_two(lines: Iterable[str]) -> int:
     program = tuple(int(i) for i in "".join(lines).split(","))
     for noun, verb in itertools.product(range(100), range(100)):
         ic = Intcode(program)
-        ic.memory[1] = noun
-        ic.memory[2] = verb
+        ic.mem[1] = noun
+        ic.mem[2] = verb
         ic.run()
-        if ic.memory[0] == 19690720:
+        if ic.mem[0] == 19690720:
             return 100 * noun + verb
     return -1

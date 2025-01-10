@@ -1,122 +1,199 @@
+import logging
+from collections import defaultdict
 from typing import Iterable
 
 
+log = logging.getLogger(__name__)
+is_debug = log.isEnabledFor(logging.DEBUG)
+
+
 class Intcode:
-    memory: list[int]
+    mem: dict[int, int]
     pointer: int = 0
     outputs: list[int]
     is_halted: bool = False
+    relative_base: int = 0
 
     def __init__(self, program: Iterable[int]):
-        self.memory = list(program)
+        self.mem = defaultdict(int)
+        self.mem.update(enumerate(program))
         self.outputs = []
+
+    @property
+    def memory(self) -> list[int]:
+        """Output memory as a list rather than a dict"""
+        max_key = max(self.mem.keys())
+        memory = [0] * (max_key + 1)
+        for i, val in self.mem.items():
+            memory[i] = val
+        return memory
+
+    def operand(self, value: int, mode: int):
+        if mode == 1:
+            result = value
+            log.debug(" + P %d M %d -> %d", value, mode, result)
+        else:
+            mem_pointer = self.mem_pointer(value, mode)
+            result = self.mem[mem_pointer]
+            log.debug(
+                " + P %d M %d -> self.mem[%d] = %d", value, mode, mem_pointer, result
+            )
+
+        return result
+
+    def mem_pointer(self, value: int, mode: int) -> int:
+        mem_pointer = value + (self.relative_base if mode == 2 else 0)
+        log.debug(" + P %d M %d -> %d", value, mode, mem_pointer)
+        return mem_pointer
 
     def run(self, input_: int | None = None) -> None:
         while not self.is_halted:
-            instruction = self.memory[self.pointer]
+            instruction = self.mem[self.pointer]
             param_modes, opcode = divmod(instruction, 100)
+            log.debug("--- Instruction %d ---", instruction)
 
-            param_pointer = self.pointer + 1
             if opcode == 1:
                 """Add"""
-                p1, p2, p3 = self.memory[param_pointer : param_pointer + 3]
+                p1 = self.mem[self.pointer + 1]
+                p2 = self.mem[self.pointer + 2]
+                p3 = self.mem[self.pointer + 3]
 
                 param_modes, p1_mode = divmod(param_modes, 10)
                 p3_mode, p2_mode = divmod(param_modes, 10)
 
-                operand1 = p1 if p1_mode else self.memory[p1]
-                operand2 = p2 if p2_mode else self.memory[p2]
-                result = operand1 + operand2
+                op1 = self.operand(p1, p1_mode)
+                op2 = self.operand(p2, p2_mode)
+                result = op1 + op2
 
-                assert p3_mode == 0
-                self.memory[p3] = result
+                mem_pointer = self.mem_pointer(p3, p3_mode)
+                self.mem[mem_pointer] = result
+                log.debug("OC%d Storing %d to mem[%d]", opcode, result, mem_pointer)
 
                 self.pointer += 4
             elif opcode == 2:
                 """Multiply"""
-                p1, p2, p3 = self.memory[param_pointer : param_pointer + 3]
+                p1 = self.mem[self.pointer + 1]
+                p2 = self.mem[self.pointer + 2]
+                p3 = self.mem[self.pointer + 3]
 
                 param_modes, p1_mode = divmod(param_modes, 10)
                 p3_mode, p2_mode = divmod(param_modes, 10)
 
-                operand1 = p1 if p1_mode else self.memory[p1]
-                operand2 = p2 if p2_mode else self.memory[p2]
-                result = operand1 * operand2
+                op1 = self.operand(p1, p1_mode)
+                op2 = self.operand(p2, p2_mode)
+                result = op1 * op2
 
-                assert p3_mode == 0
-                self.memory[p3] = result
+                mem_pointer = self.mem_pointer(p3, p3_mode)
+                self.mem[mem_pointer] = result
+                log.debug("OC%d Storing %d to mem[%d]", opcode, result, mem_pointer)
 
                 self.pointer += 4
             elif opcode == 3:
                 """Store input"""
-                p1 = self.memory[param_pointer]
+                p1 = self.memory[self.pointer + 1]
+                param_modes, p1_mode = divmod(param_modes, 10)
+
+                mem_pointer = self.mem_pointer(p1, p1_mode)
 
                 if input_ is None:
+                    log.debug("OC%d No input available. Pausing.", opcode)
                     break
-                self.memory[p1] = input_
+                self.mem[mem_pointer] = input_
+                log.debug("OC%d Storing %d to %d", opcode, input_, mem_pointer)
                 input_ = None
                 self.pointer += 2
             elif opcode == 4:
                 """Output"""
-                p1 = self.memory[param_pointer]
+                p1 = self.mem[self.pointer + 1]
+
                 p1_mode = param_modes
-                operand1 = p1 if p1_mode else self.memory[p1]
-                self.outputs.append(operand1)
+                op1 = self.operand(p1, p1_mode)
+                self.outputs.append(op1)
+                log.debug("OC%d Outputting %d", opcode, op1)
                 self.pointer += 2
             elif opcode == 5:
                 """Jump if true"""
-                p1, p2 = self.memory[param_pointer : param_pointer + 2]
+                p1 = self.mem[self.pointer + 1]
+                p2 = self.mem[self.pointer + 2]
+
                 p2_mode, p1_mode = divmod(param_modes, 10)
 
-                operand1 = p1 if p1_mode else self.memory[p1]
-                operand2 = p2 if p2_mode else self.memory[p2]
+                op1 = self.operand(p1, p1_mode)
+                op2 = self.operand(p2, p2_mode)
 
-                if operand1 != 0:
+                if op1 != 0:
                     # Jump
-                    self.pointer = operand2
+                    log.debug("OC%d Jump to %d", opcode, op2)
+                    self.pointer = op2
                 else:
                     # No jump, regular increment
+                    log.debug("OC%d No jump", opcode)
                     self.pointer += 3
             elif opcode == 6:
                 """Jump if false"""
-                p1, p2 = self.memory[param_pointer : param_pointer + 2]
+                p1 = self.mem[self.pointer + 1]
+                p2 = self.mem[self.pointer + 2]
+
                 p2_mode, p1_mode = divmod(param_modes, 10)
 
-                operand1 = p1 if p1_mode else self.memory[p1]
-                operand2 = p2 if p2_mode else self.memory[p2]
+                op1 = self.operand(p1, p1_mode)
+                op2 = self.operand(p2, p2_mode)
 
-                if operand1 == 0:
+                if op1 == 0:
                     # Jump
-                    self.pointer = operand2
+                    log.debug("OC%d Jump to %d", opcode, op2)
+                    self.pointer = op2
                 else:
                     # No jump, regular increment
+                    log.debug("OC%d No jump", opcode)
                     self.pointer += 3
             elif opcode == 7:
                 """Less than"""
-                p1, p2, p3 = self.memory[param_pointer : param_pointer + 3]
+                p1 = self.mem[self.pointer + 1]
+                p2 = self.mem[self.pointer + 2]
+                p3 = self.mem[self.pointer + 3]
 
                 param_modes, p1_mode = divmod(param_modes, 10)
                 p3_mode, p2_mode = divmod(param_modes, 10)
 
-                operand1 = p1 if p1_mode else self.memory[p1]
-                operand2 = p2 if p2_mode else self.memory[p2]
+                op1 = self.operand(p1, p1_mode)
+                op2 = self.operand(p2, p2_mode)
+                mem_pointer = self.mem_pointer(p3, p3_mode)
 
-                self.memory[p3] = operand1 < operand2
+                result = int(op1 < op2)
+                self.mem[mem_pointer] = result
+
+                log.debug("OC%d Storing %d to mem[%d]", opcode, result, mem_pointer)
 
                 self.pointer += 4
             elif opcode == 8:
                 """Equals"""
-                p1, p2, p3 = self.memory[param_pointer : param_pointer + 3]
+                p1 = self.mem[self.pointer + 1]
+                p2 = self.mem[self.pointer + 2]
+                p3 = self.mem[self.pointer + 3]
 
                 param_modes, p1_mode = divmod(param_modes, 10)
                 p3_mode, p2_mode = divmod(param_modes, 10)
 
-                operand1 = p1 if p1_mode else self.memory[p1]
-                operand2 = p2 if p2_mode else self.memory[p2]
+                op1 = self.operand(p1, p1_mode)
+                op2 = self.operand(p2, p2_mode)
+                mem_pointer = self.mem_pointer(p3, p3_mode)
 
-                self.memory[p3] = operand1 == operand2
+                result = int(op1 == op2)
+                self.mem[mem_pointer] = result
+                log.debug("OC%d Storing %d to mem[%d]", opcode, result, mem_pointer)
 
                 self.pointer += 4
+            elif opcode == 9:
+                """Adjust relative base"""
+                log.debug("OC%d Current relative base %d", opcode, self.relative_base)
+                p1 = self.mem[self.pointer + 1]
+                op1 = self.operand(p1, param_modes)
+
+                self.relative_base += op1
+                log.debug("OC%d New relative base %d", opcode, self.relative_base)
+
+                self.pointer += 2
             elif opcode == 99:
                 self.is_halted = True
 

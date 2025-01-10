@@ -1,3 +1,4 @@
+import math
 import random
 
 import pytest
@@ -175,6 +176,30 @@ def test_less_greater_equals_8():
     output = ic.outputs
     assert len(output) == 1
     assert output[0] == 1001
+
+
+def test_quine():
+    program_str = "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"
+    program = list(map(int, program_str.split(",")))
+    ic = Intcode(program)
+    ic.run()
+    assert ic.outputs == program
+
+
+def test_large_nums():
+    program_str = "1102,34915192,34915192,7,4,7,99,0"
+    program = list(map(int, program_str.split(",")))
+    ic = Intcode(program)
+    ic.run()
+    big = ic.outputs[0]
+    assert math.log10(big) > 15
+
+    program_str = "104,1125899906842624,99"
+    program = list(map(int, program_str.split(",")))
+    ic = Intcode(program)
+    ic.run()
+    big = ic.outputs[0]
+    assert big == program[1]
 
 
 @pytest.mark.parametrize(
