@@ -28,7 +28,8 @@ PART_TWO_RESULT = 9168267
 def part_one(lines: Iterable[str]) -> int:
     program = [int(i) for i in "".join(lines).split(",")]
     ic = Intcode(program)
-    outputs = ic.run(1)
+    ic.run(1)
+    outputs = ic.outputs
     if any(o != 0 for o in outputs[:-1]):
         print("outputs should be 0:", outputs)
     return outputs[-1]
@@ -37,5 +38,5 @@ def part_one(lines: Iterable[str]) -> int:
 def part_two(lines: Iterable[str]) -> int:
     program = [int(i) for i in "".join(lines).split(",")]
     ic = Intcode(program)
-    outputs = ic.run(5)
-    return outputs[0]
+    ic.run(5)
+    return ic.outputs[0]
