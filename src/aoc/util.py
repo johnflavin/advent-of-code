@@ -174,12 +174,15 @@ OFFSETS = (
     (1, 0),
     (0, 1),
 )
-OFFSETS_WITH_DIAGS = (
-    *OFFSETS,
+DIAGS = (
     (1, 1),
     (1, -1),
     (-1, 1),
     (-1, -1),
+)
+OFFSETS_WITH_DIAGS = (
+    *OFFSETS,
+    *DIAGS,
 )
 
 
@@ -198,6 +201,11 @@ def sub(a: Pt, b: Pt) -> Pt:
 def neighbors(pt: Pt, diags: bool = False) -> Iterable[Pt]:
     offsets = OFFSETS_WITH_DIAGS if diags else OFFSETS
     for delta in offsets:
+        yield add(pt, delta)
+
+
+def diags(pt: Pt) -> Iterable[Pt]:
+    for delta in DIAGS:
         yield add(pt, delta)
 
 
