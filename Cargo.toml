@@ -1,6 +1,6 @@
 [package]
 name = "advent-of-code"
-version = "2024.0.0"
+version = "2025.0.0"
 edition = "2021"
 authors = ["John Flavin"]
 license = "MIT"
@@ -16,16 +16,15 @@ path = "src/lib.rs"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
-reqwest = { version = "0.11", features = ["blocking", "cookies"] }
+reqwest = { version = "0.12", features = ["blocking", "cookies"] }
 anyhow = "1.0"
 chrono = "0.4"
 arboard = "3"
-directories = "5"
 env_logger = "0.11"
 log = "0.4"
 
 [dev-dependencies]
-rstest = "0.18"
+rstest = "0.26"
 
 [profile.release]
 opt-level = 3
