@@ -134,30 +134,28 @@ impl Runner {
             Part::Two => solver.part2_example(),
         };
 
-        let expected = match part {
+        let expected_result = match part {
             Part::One => solver.part1_example_result(),
             Part::Two => solver.part2_example_result(),
         };
 
-        if example_input.is_empty() {
-            return None;
-        }
-
-        let actual_result = match part {
-            Part::One => solver.part1(example_input),
-            Part::Two => solver.part2(example_input),
-        };
-
-        if let Ok(actual) = actual_result {
-            let result = if actual == expected? {
-                PartResult::Correct(actual)
-            } else {
-                PartResult::Incorrect {
-                    actual,
-                    expected: expected?.to_owned(),
-                }
+        if let Some(expected) = expected_result {
+            let actual_result = match part {
+                Part::One => solver.part1(example_input),
+                Part::Two => solver.part2(example_input),
             };
-            return Some(result);
+
+            if let Ok(actual) = actual_result {
+                let result = if actual == expected {
+                    PartResult::Correct(actual)
+                } else {
+                    PartResult::Incorrect {
+                        actual,
+                        expected: expected.to_owned(),
+                    }
+                };
+                return Some(result);
+            }
         }
         None
     }
