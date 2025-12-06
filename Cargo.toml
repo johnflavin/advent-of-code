@@ -1,0 +1,33 @@
+[package]
+name = "advent-of-code"
+version = "2024.0.0"
+edition = "2021"
+authors = ["John Flavin"]
+license = "MIT"
+# Exclude Python code from Rust compilation
+exclude = ["src/aoc/**"]
+
+[[bin]]
+name = "aoc"
+path = "src/main.rs"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+reqwest = { version = "0.11", features = ["blocking", "cookies"] }
+anyhow = "1.0"
+chrono = "0.4"
+arboard = "3"
+directories = "5"
+env_logger = "0.11"
+log = "0.4"
+
+[dev-dependencies]
+rstest = "0.18"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

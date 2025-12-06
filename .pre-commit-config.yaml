@@ -1,4 +1,5 @@
 repos:
+# Python hooks
 -   repo: https://github.com/python/black
     rev: 24.10.0
     hooks:
@@ -8,3 +9,12 @@ repos:
     hooks:
     -   id: flake8
         args: [--per-file-ignores=__init__.py:F401]
+
+# Rust hooks
+-   repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+    -   id: fmt
+        args: ['--manifest-path', 'Cargo.toml', '--']
+    -   id: clippy
+        args: ['--manifest-path', 'Cargo.toml', '--', '-D', 'warnings']
