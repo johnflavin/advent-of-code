@@ -1,6 +1,7 @@
 use crate::solver::Solver;
 use anyhow::Result;
 use log::debug;
+use std::collections::HashSet;
 
 pub struct Day02;
 
@@ -100,28 +101,110 @@ impl Solver for Day02 {
         // I had a whole solution written up that didn't work.
         // I'm going to do the dumbest thing imaginable:
         //  just look at every number in the range
+        // Note: This did get me the answer.
+        //
+        // No, this sucks. It is so slow.
+        // Not only am I generating numbers I know I don't need, I'm
+        //   converting them to strings and back.
+        // I could skip the string part by checking if the numbers are multiples of
+        // things like 111, 101, 1001001, etc. depending on the length.
+        // But I would still be generating a lot of numbers that don't match.
+        // Better to use those multiples of 1s and 0s above to generate the numbers.
+        // Then I don't need to check anything, except maybe one or two on the ends.
+        // Two problems:
+        // 1. How do I programmatically generate those multiples given a range?
+        // 2. How do I know what to multiply them by? For instance, it's all good to know
+        //   two-digit ranges need 11, but how do I go from there to 11, 22, 33 etc. without
+        //   just generating them all?
+        // Examples
+        // 5210718-5346163
+        // Length left 7 right 7
+        // Factors (1,7) (prime; this reasoning goes for any prime)
+        // 1111111 = sum_0^{7-1} 10^{1*i}
+        // Span-1 left 5 right 5
+        // Candidate 5555555
+        //
+        // 648632326-648673051
+        // Length left 9 right 9
+        // Factors (1,9) (3,3)
+        // 111111111 = sum_0^{9-1} 10^{1*i}
+        // Span-1 left 6 right 6
+        // Candidate 666666666
+        // 001001001 = sum_0^{3-1} 10^{3*i}
+        // Span-3 left 648 right 648
+        // Candidate 648648648
+        //
+        // 1255-1813
+        // Length left 4 right 4
+        // Factors (1,4) (2,2)
+        // 1111 = sum_0^{4-1} 10^{1*i}
+        // Span-1 left 1 right 1
+        // Candidate 1111
+        // 0101 = sum_0^{2-1} 10^{2*i}
+        // Span-2 left 12 right 18
+        // Candidates 1212 1313 1414 1515 1616 1717 1818
+        //
+        // For mixed-length ranges maybe I split them into two ranges of consistent length
 
         let mut total: u64 = 0;
         for range in _input.trim().split(",") {
             debug!("{}", range);
             let (left_s, right_s) = range.split_once('-').unwrap();
+
             let range_min = left_s.parse::<u64>()?;
             let range_max = right_s.parse::<u64>()?;
 
-            for candidate in range_min..=range_max {
-                let candidate_s = candidate.to_string();
-                for (factor, multiplicity) in factors(candidate_s.len()) {
-                    let first_n = &candidate_s[..factor];
-                    if candidate == first_n.repeat(multiplicity).parse::<u64>()? {
-                        debug!(" + {} ={}x{}", candidate, first_n, multiplicity);
-                        total += candidate;
-                        break;
-                    }
+            let mut candidates = HashSet::new();
+            if left_s.len() == right_s.len() {
+                candidates.extend(generate_candidates(left_s, right_s));
+            } else {
+                let first_subrange_right = (10_u64.pow(left_s.len() as u32) - 1).to_string();
+                let second_subrange_left = 10_u64.pow(right_s.len() as u32 - 1).to_string();
+                candidates.extend(generate_candidates(left_s, &first_subrange_right));
+                candidates.extend(generate_candidates(&second_subrange_left, right_s));
+            }
+
+            for candidate in candidates {
+                if range_min <= candidate && candidate <= range_max {
+                    debug!(" + {}", candidate);
+                    total += candidate;
+                } else {
+                    debug!("   {}", candidate);
                 }
             }
         }
         Ok(total.to_string())
     }
+}
+
+fn generate_candidates(left_s: &str, right_s: &str) -> HashSet<u64> {
+    let len = left_s.len();
+    if len != right_s.len() {
+        panic!(
+            "This function only accepts homogeneous length range strings. Input: {} {}",
+            left_s, right_s
+        );
+    }
+    let mut candidates = HashSet::new();
+    if len == 1 {
+        return candidates;
+    }
+    for (factor1, factor2) in factors(left_s.len()) {
+        let multiple = (0..factor2)
+            .map(|i| 10_u64.pow((factor1 * i) as u32))
+            .sum::<u64>();
+
+        // Take the first factor1 digits from left and right
+        let left_n = first_n(left_s, factor1);
+        let right_n = first_n(right_s, factor1);
+        debug!(
+            "factor ({}, {}) multiple {} left-{} {} right-{} {}",
+            factor1, factor2, multiple, factor1, left_n, factor1, right_n
+        );
+        candidates.extend((left_n..=right_n).map(|i| i * multiple));
+    }
+
+    candidates
 }
 
 fn factors(len: usize) -> Vec<(usize, usize)> {
@@ -139,6 +222,10 @@ fn factors(len: usize) -> Vec<(usize, usize)> {
     }
 
     factors
+}
+
+fn first_n(digits: &str, n: usize) -> u64 {
+    digits[..n].parse::<u64>().unwrap()
 }
 
 #[cfg(test)]
