@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use log::debug;
 use std::fs;
 use std::path::PathBuf;
 
@@ -36,6 +37,7 @@ impl InputManager {
         let cache_file = self.cache_dir.join(format!("{}-12-{:02}.txt", year, day));
 
         if cache_file.exists() {
+            debug!("Reading cached input: {}-12-{:02}", year, day);
             fs::read_to_string(cache_file).context("Failed to read cached input file")
         } else {
             let content = self.download_input(year, day)?;
@@ -46,6 +48,7 @@ impl InputManager {
     }
 
     fn download_input(&self, year: u16, day: u8) -> Result<String> {
+        debug!("Downloading input: {}-12-{}", year, day);
         let url = format!("https://adventofcode.com/{}/day/{}/input", year, day);
 
         let client = reqwest::blocking::Client::new();
