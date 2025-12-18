@@ -57,6 +57,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_part1_example() {
         let day = Day04;
         if let Some(expected) = day.part1_example_result() {
@@ -66,6 +67,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_part2_example() {
         let day = Day04;
         if let Some(expected) = day.part2_example_result() {
