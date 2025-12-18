@@ -87,57 +87,7 @@ impl Solver for DayXX {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::input::InputManager;
-
-    #[test]
-    #[ignore]
-    fn test_part1_example() {
-        let day = DayXX;
-        if let Some(expected) = day.part1_example_result() {
-            let result = day.part1(day.part1_example()).unwrap();
-            assert_eq!(result, expected);
-        }
-    }
-
-    #[test]
-    #[ignore]
-    fn test_part2_example() {
-        let day = DayXX;
-        if let Some(expected) = day.part2_example_result() {
-            let result = day.part2(day.part2_example()).unwrap();
-            assert_eq!(result, expected);
-        }
-    }
-
-    #[test]
-    IGNORE_ATTR
-    fn test_part1_actual() {
-        let day = DayXX;
-        if let Some(expected) = day.part1_result() {
-            let input_manager = InputManager::new().unwrap();
-            if let Some(input) = input_manager.get_cached_input(day.year(), day.day()) {
-                let result = day.part1(&input).unwrap();
-                assert_eq!(result, expected);
-            }
-        }
-    }
-
-    #[test]
-    IGNORE_ATTR
-    fn test_part2_actual() {
-        let day = DayXX;
-        if let Some(expected) = day.part2_result() {
-            let input_manager = InputManager::new().unwrap();
-            if let Some(input) = input_manager.get_cached_input(day.year(), day.day()) {
-                let result = day.part2(&input).unwrap();
-                assert_eq!(result, expected);
-            }
-        }
-    }
-}
+MACRO_INVOCATION
 EOF
 
 # Create all 25 day files with zero-padded filenames (day01.rs, day02.rs, etc.)
@@ -149,15 +99,15 @@ for day_num in {1..25}; do
     # Files: day01.rs, Structs: Day01, day() returns: 1
     # Important: Replace DayXX first, then XX (order matters!)
 
-    # Set IGNORE_ATTR based on day number
+    # Set macro invocation based on day number
     # Days 1-5: no #[ignore], Days 6-25: #[ignore]
     if [ $day_num -le 5 ]; then
-        ignore_attr=""
+        macro_line="crate::solver_tests!(Day$day);"
     else
-        ignore_attr="#[ignore]"
+        macro_line="crate::solver_tests!(Day$day, #[ignore]);"
     fi
 
-    sed "s/DayXX/Day$day/g; s/XX/$day_num/g; s/YEAR/$YEAR/g; s/IGNORE_ATTR/$ignore_attr/g" /tmp/aoc_day_template.rs > "$YEAR_DIR/day$day.rs"
+    sed "s/DayXX/Day$day/g; s/XX/$day_num/g; s/YEAR/$YEAR/g; s|MACRO_INVOCATION|$macro_line|g" /tmp/aoc_day_template.rs > "$YEAR_DIR/day$day.rs"
 done
 
 # Create mod.rs
