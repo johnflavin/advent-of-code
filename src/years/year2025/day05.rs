@@ -101,6 +101,7 @@ fn parse(_input: &str) -> (Vec<Range<u64>>, Vec<u64>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::input::InputManager;
 
     #[test]
     fn test_part1_example() {
@@ -117,6 +118,30 @@ mod tests {
         if let Some(expected) = day.part2_example_result() {
             let result = day.part2(day.part2_example()).unwrap();
             assert_eq!(result, expected);
+        }
+    }
+
+    #[test]
+    fn test_part1_actual() {
+        let day = Day05;
+        if let Some(expected) = day.part1_result() {
+            let input_manager = InputManager::new().unwrap();
+            if let Some(input) = input_manager.get_cached_input(day.year(), day.day()) {
+                let result = day.part1(&input).unwrap();
+                assert_eq!(result, expected);
+            }
+        }
+    }
+
+    #[test]
+    fn test_part2_actual() {
+        let day = Day05;
+        if let Some(expected) = day.part2_result() {
+            let input_manager = InputManager::new().unwrap();
+            if let Some(input) = input_manager.get_cached_input(day.year(), day.day()) {
+                let result = day.part2(&input).unwrap();
+                assert_eq!(result, expected);
+            }
         }
     }
 }

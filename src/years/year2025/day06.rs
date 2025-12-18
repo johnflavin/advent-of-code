@@ -13,8 +13,10 @@ impl Solver for Day06 {
     }
 
     fn part1_example(&self) -> &str {
-        // TODO: Add example input
-        ""
+        "123 328  51 64
+ 45 64  387 23
+  6 98  215 314
+*   +   *   +  "
     }
 
     fn part2_example(&self) -> &str {
@@ -22,8 +24,7 @@ impl Solver for Day06 {
     }
 
     fn part1_example_result(&self) -> Option<&str> {
-        // TODO: Add expected result for part 1 example
-        None
+        Some("4277556")
     }
 
     fn part2_example_result(&self) -> Option<&str> {
@@ -55,6 +56,7 @@ impl Solver for Day06 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::input::InputManager;
 
     #[test]
     #[ignore]
@@ -73,6 +75,32 @@ mod tests {
         if let Some(expected) = day.part2_example_result() {
             let result = day.part2(day.part2_example()).unwrap();
             assert_eq!(result, expected);
+        }
+    }
+
+    #[test]
+    #[ignore]
+    fn test_part1_actual() {
+        let day = Day06;
+        if let Some(expected) = day.part1_result() {
+            let input_manager = InputManager::new().unwrap();
+            if let Some(input) = input_manager.get_cached_input(day.year(), day.day()) {
+                let result = day.part1(&input).unwrap();
+                assert_eq!(result, expected);
+            }
+        }
+    }
+
+    #[test]
+    #[ignore]
+    fn test_part2_actual() {
+        let day = Day06;
+        if let Some(expected) = day.part2_result() {
+            let input_manager = InputManager::new().unwrap();
+            if let Some(input) = input_manager.get_cached_input(day.year(), day.day()) {
+                let result = day.part2(&input).unwrap();
+                assert_eq!(result, expected);
+            }
         }
     }
 }

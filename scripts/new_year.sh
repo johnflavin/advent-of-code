@@ -90,6 +90,7 @@ impl Solver for DayXX {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::input::InputManager;
 
     #[test]
     #[ignore]
@@ -110,6 +111,32 @@ mod tests {
             assert_eq!(result, expected);
         }
     }
+
+    #[test]
+    IGNORE_ATTR
+    fn test_part1_actual() {
+        let day = DayXX;
+        if let Some(expected) = day.part1_result() {
+            let input_manager = InputManager::new().unwrap();
+            if let Some(input) = input_manager.get_cached_input(day.year(), day.day()) {
+                let result = day.part1(&input).unwrap();
+                assert_eq!(result, expected);
+            }
+        }
+    }
+
+    #[test]
+    IGNORE_ATTR
+    fn test_part2_actual() {
+        let day = DayXX;
+        if let Some(expected) = day.part2_result() {
+            let input_manager = InputManager::new().unwrap();
+            if let Some(input) = input_manager.get_cached_input(day.year(), day.day()) {
+                let result = day.part2(&input).unwrap();
+                assert_eq!(result, expected);
+            }
+        }
+    }
 }
 EOF
 
@@ -121,7 +148,16 @@ for day_num in {1..25}; do
     # day_num is the integer (1-25), $day is zero-padded (01-25)
     # Files: day01.rs, Structs: Day01, day() returns: 1
     # Important: Replace DayXX first, then XX (order matters!)
-    sed "s/DayXX/Day$day/g; s/XX/$day_num/g; s/YEAR/$YEAR/g" /tmp/aoc_day_template.rs > "$YEAR_DIR/day$day.rs"
+
+    # Set IGNORE_ATTR based on day number
+    # Days 1-5: no #[ignore], Days 6-25: #[ignore]
+    if [ $day_num -le 5 ]; then
+        ignore_attr=""
+    else
+        ignore_attr="#[ignore]"
+    fi
+
+    sed "s/DayXX/Day$day/g; s/XX/$day_num/g; s/YEAR/$YEAR/g; s/IGNORE_ATTR/$ignore_attr/g" /tmp/aoc_day_template.rs > "$YEAR_DIR/day$day.rs"
 done
 
 # Create mod.rs

@@ -33,8 +33,12 @@ impl InputManager {
         })
     }
 
+    fn cache_file_path(&self, year: u16, day: u8) -> PathBuf {
+        self.cache_dir.join(format!("{}-12-{:02}.txt", year, day))
+    }
+
     pub fn get_input(&self, year: u16, day: u8) -> Result<String> {
-        let cache_file = self.cache_dir.join(format!("{}-12-{:02}.txt", year, day));
+        let cache_file = self.cache_file_path(year, day);
 
         if cache_file.exists() {
             debug!("Reading cached input: {}-12-{:02}", year, day);
@@ -44,6 +48,21 @@ impl InputManager {
             fs::write(&cache_file, &content)
                 .context("Failed to write downloaded input to cache")?;
             Ok(content)
+        }
+    }
+
+    /// Check if input file exists without downloading
+    pub fn input_exists(&self, year: u16, day: u8) -> bool {
+        self.cache_file_path(year, day).exists()
+    }
+
+    /// Get cached input if it exists, otherwise return None
+    pub fn get_cached_input(&self, year: u16, day: u8) -> Option<String> {
+        let cache_file = self.cache_file_path(year, day);
+        if cache_file.exists() {
+            fs::read_to_string(cache_file).ok()
+        } else {
+            None
         }
     }
 
