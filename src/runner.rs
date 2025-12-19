@@ -13,22 +13,17 @@ pub enum PartResult {
     Unknown(String),
 }
 
-pub struct RunResult {
-    pub example: Option<PartResult>,
-    pub actual: Option<PartResult>,
-}
+pub struct Runner;
 
-pub struct Runner {
-    run_example: bool,
-    run_actual: bool,
+impl Default for Runner {
+    fn default() -> Self {
+        Self
+    }
 }
 
 impl Runner {
-    pub fn new(run_example: bool, run_actual: bool) -> Self {
-        Self {
-            run_example,
-            run_actual,
-        }
+    pub fn new() -> Self {
+        Self
     }
 
     fn display_result(&self, label: &str, result: &PartResult) {
@@ -74,58 +69,43 @@ impl Runner {
 
             info!("Part {}", part.number());
 
-            let part_result = self.run_part(solver, part)?;
+            // Check if this part is already solved
+            let expected_result = match part {
+                Part::One => solver.part1_result(),
+                Part::Two => solver.part2_result(),
+            };
 
-            if let Some(example_result) = part_result.example {
-                self.display_result("Example", &example_result);
-
-                if matches!(example_result, PartResult::Incorrect { .. }) {
-                    return Ok(false);
-                }
-            }
-
-            if let Some(actual_result) = part_result.actual {
+            if expected_result.is_some() {
+                // Already solved: just run actual and verify
+                let actual_result = self.run_actual(solver, part)?;
                 self.display_result("Actual", &actual_result);
-                self.handle_clipboard(&actual_result);
 
                 match actual_result {
                     PartResult::Incorrect { .. } => return Ok(false),
-                    PartResult::Unknown(_) => return Ok(true),
-                    PartResult::Correct(_) => {}
+                    PartResult::Correct(_) => {} // Continue to next part
+                    PartResult::Unknown(_) => unreachable!(), // We checked expected_result.is_some()
                 }
+            } else {
+                // Not yet solved: run example first, then actual if example passes
+                if let Some(example_result) = self.run_example(solver, part) {
+                    self.display_result("Example", &example_result);
+
+                    if matches!(example_result, PartResult::Incorrect { .. }) {
+                        return Ok(false);
+                    }
+                }
+
+                // Example passed (or no example), run actual
+                let actual_result = self.run_actual(solver, part)?;
+                self.display_result("Actual", &actual_result);
+                self.handle_clipboard(&actual_result);
+
+                // Stop after running unsolved part (result copied to clipboard)
+                return Ok(true);
             }
         }
 
         Ok(true)
-    }
-
-    fn run_part(&self, solver: &dyn Solver, part: Part) -> Result<RunResult> {
-        let mut example_result = None;
-
-        // Run example if requested
-        if self.run_example {
-            example_result = self.run_example(solver, part);
-
-            if let Some(PartResult::Incorrect { .. }) = example_result {
-                // If example fails return early, don't run actual
-                return Ok(RunResult {
-                    example: example_result,
-                    actual: None,
-                });
-            }
-        }
-
-        // Run actual if requested
-        let actual_result = if self.run_actual {
-            Some(self.run_actual(solver, part)?)
-        } else {
-            None
-        };
-
-        Ok(RunResult {
-            example: example_result,
-            actual: actual_result,
-        })
     }
 
     fn run_example(&self, solver: &dyn Solver, part: Part) -> Option<PartResult> {

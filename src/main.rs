@@ -31,10 +31,19 @@ fn main() -> Result<()> {
         .ok_or_else(|| anyhow::anyhow!("No solver found for {}-12-{:02}", year, day))?;
 
     // Determine which parts to run
-    let parts = cli.parts();
+    let parts = if !cli.part.is_empty() {
+        // Explicit --part flags take precedence
+        cli.part.clone()
+    } else if solver.part1_result().is_none() {
+        // Part 1 not yet solved, only run part 1
+        vec![1]
+    } else {
+        // Part 1 solved, run both parts
+        vec![1, 2]
+    };
 
     // Create runner
-    let runner = Runner::new(cli.should_run_example(), cli.should_run_actual());
+    let runner = Runner::new();
 
     // Run puzzle
     let success = runner.run(&*solver, &parts)?;
