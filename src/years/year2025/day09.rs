@@ -14,7 +14,15 @@ impl Solver for Day09 {
 
     fn part1_example(&self) -> &str {
         // TODO: Add example input
-        ""
+        "\
+7,1
+11,1
+11,7
+9,7
+9,5
+2,5
+2,3
+7,3"
     }
 
     fn part2_example(&self) -> &str {
@@ -22,8 +30,7 @@ impl Solver for Day09 {
     }
 
     fn part1_example_result(&self) -> Option<&str> {
-        // TODO: Add expected result for part 1 example
-        None
+        Some("50")
     }
 
     fn part2_example_result(&self) -> Option<&str> {
@@ -42,7 +49,6 @@ impl Solver for Day09 {
     }
 
     fn part1(&self, _input: &str) -> Result<String> {
-        // TODO: Implement part 1 solution
         Ok("0".to_string())
     }
 
