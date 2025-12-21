@@ -10,7 +10,10 @@ pub struct Range<T: PrimInt> {
 
 impl<T: PrimInt> Range<T> {
     pub fn new(start: T, end: T) -> Self {
-        Range { start, end }
+        Range {
+            start: min(start, end),
+            end: max(start, end),
+        }
     }
 
     /// Check if this range overlaps with another
