@@ -15,4 +15,8 @@ pub struct Cli {
     /// Enable debug logging
     #[arg(short, long)]
     pub debug: bool,
+
+    /// Run only example input (do not run actual input)
+    #[arg(long)]
+    pub example: bool,
 }

@@ -46,7 +46,7 @@ fn main() -> Result<()> {
     let runner = Runner::new();
 
     // Run puzzle
-    let success = runner.run(&*solver, &parts)?;
+    let success = runner.run(&*solver, &parts, cli.example)?;
 
     if !success {
         bail!("Some tests failed");
