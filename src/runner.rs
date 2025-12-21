@@ -236,6 +236,7 @@ mod tests {
             self
         }
 
+        #[allow(unused)]
         fn with_part2_result(mut self, result: &'static str) -> Self {
             self.part2_result = Some(result);
             self
