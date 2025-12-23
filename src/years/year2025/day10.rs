@@ -55,15 +55,22 @@ impl Solver for Day10 {
     Shower thought: encode as a binary number. Transitions are XORs.
     */
     fn part1(&self, input: &str) -> Result<String> {
-        let part = Part::One;
-        Ok(input
-            .trim()
-            .lines()
-            .fold(0usize, |total, line| {
-                let (target, transitions) = Self::parse(line, part);
-                total + Self::solve(target, &transitions, part)
-            })
-            .to_string())
+        let total = input.trim().lines().fold(0usize, |total, line| {
+            let (target_vec, transition_idx_vec) = Self::parse(line, Part::One);
+            let target = target_vec
+                .iter()
+                .fold(0usize, |s, idx| s + (1 << idx) as usize);
+            let transitions = transition_idx_vec
+                .iter()
+                .map(|transition_idx_vec| {
+                    transition_idx_vec
+                        .iter()
+                        .fold(0usize, |s, idx| s + (1 << idx) as usize)
+                })
+                .collect::<Vec<_>>();
+            total + Self::solve_part1(target, &transitions)
+        });
+        Ok(total.to_string())
     }
     /**
     I started trying to solve this the same way as part 1 and... no.
@@ -74,13 +81,29 @@ impl Solver for Day10 {
     This really seems more like a linear programming problem.
     But I don't know what that means exactly or how to solve it!
     */
-    fn part2(&self, _input: &str) -> Result<String> {
-        Ok("0".to_string())
+    fn part2(&self, input: &str) -> Result<String> {
+        let total = input.trim().lines().fold(0usize, |total, line| {
+            #[allow(unused)]
+            let (target_vec, transition_idx_vec) = Self::parse(line, Part::Two);
+            // let target = target_vec
+            //     .iter()
+            //     .fold(0usize, |s, idx| s + (1 << idx) as usize);
+            // let transitions = transition_idx_vec
+            //     .iter()
+            //     .map(|transition_idx_vec| {
+            //         transition_idx_vec.iter().fold(0usize, |s, idx| s + (1 << idx) as usize)
+            //     })
+            //     .collect::<Vec<_>>();
+            // total + Self::solve_part1(target, &transitions)
+            total
+        });
+
+        Ok(total.to_string())
     }
 }
 
 impl Day10 {
-    fn solve(target: usize, transitions: &[usize], part: Part) -> usize {
+    fn solve_part1(target: usize, transitions: &[usize]) -> usize {
         let mut stack = VecDeque::new();
         // Stack: (current value, number of steps)
         stack.push_front((0usize, 0usize));
@@ -97,41 +120,35 @@ impl Day10 {
             }
 
             transitions.iter().for_each(|&transition| {
-                stack.push_front((
-                    match part {
-                        Part::One => current_value.bitxor(transition),
-                        Part::Two => current_value + transition,
-                    },
-                    num_steps + 1,
-                ))
+                stack.push_front((current_value.bitxor(transition), num_steps + 1))
             })
         }
 
         0
     }
 
-    fn parse(line: &str, part: Part) -> (usize, Vec<usize>) {
+    fn parse(line: &str, part: Part) -> (Vec<usize>, Vec<Vec<usize>>) {
         debug!("{}", line);
         let mut line_iter = line.trim().chars();
         // First char is a [
         line_iter.next();
 
         // Next batch of characters is our target
-        let mut target = 0;
+        let mut target: Vec<usize> = Vec::new();
         for (i, c) in line_iter.by_ref().enumerate() {
             match c {
                 '.' => (),
-                '#' => target += 2usize.pow(i as u32),
+                '#' => target.push(i),
                 ']' => break,
-                _ => panic!("Unexpected char {} at position {}", c, i),
+                _ => panic!("Unexpected char {}", c),
             }
         }
 
         // Skip a space
         line_iter.next();
 
-        let mut transitions_exp = Vec::new();
-        let mut this_exp = Vec::new();
+        let mut transition_idx_vecs = Vec::new();
+        let mut this_transition_idx_vec = Vec::new();
         let mut buffer = String::new();
         for c in line_iter.by_ref() {
             match c {
@@ -139,13 +156,13 @@ impl Day10 {
                 '(' => (),
                 d if d.is_ascii_digit() => buffer.push(d),
                 ',' => {
-                    this_exp.push(buffer.parse::<usize>().unwrap());
+                    this_transition_idx_vec.push(buffer.parse::<usize>().unwrap());
                     buffer.clear()
                 }
                 ')' => {
-                    this_exp.push(buffer.parse::<usize>().unwrap());
-                    transitions_exp.push(this_exp.clone());
-                    this_exp.clear();
+                    this_transition_idx_vec.push(buffer.parse::<usize>().unwrap());
+                    transition_idx_vecs.push(this_transition_idx_vec.clone());
+                    this_transition_idx_vec.clear();
                     buffer.clear();
                 }
                 '{' => break,
@@ -155,24 +172,19 @@ impl Day10 {
         }
 
         // Now parse out the targets for part 2
-        let (base, target) = if part == Part::Two {
-            let mut target_mult = Vec::new();
-            let mut buffer = String::new();
-            let mut max_exp = 0;
+        let target = if part == Part::Two {
+            let mut part2_target = Vec::new();
+            buffer.clear();
 
             for c in line_iter.by_ref() {
                 match c {
                     d if d.is_ascii_digit() => buffer.push(d),
                     ',' => {
-                        let e = buffer.parse::<usize>().unwrap();
-                        max_exp = max_exp.max(e);
-                        target_mult.push(e);
+                        part2_target.push(buffer.parse::<usize>().unwrap());
                         buffer.clear();
                     }
                     '}' => {
-                        let e = buffer.parse::<usize>().unwrap();
-                        max_exp = max_exp.max(e);
-                        target_mult.push(e);
+                        part2_target.push(buffer.parse::<usize>().unwrap());
                         buffer.clear();
                         break;
                     }
@@ -180,27 +192,17 @@ impl Day10 {
                 }
                 // debug!(" c {} buffer {} current {}", c, buffer, current);
             }
-            let b = max_exp + 1;
-            debug!(" base: {}", b);
-            (
-                b,
-                target_mult
-                    .iter()
-                    .enumerate()
-                    .fold(0usize, |s, (i, &mult)| s + mult * b.pow(i as u32)),
-            )
+            part2_target
         } else {
-            (2usize, target)
+            target
         };
 
-        let transitions = transitions_exp
-            .iter()
-            .map(|exps| exps.iter().fold(0usize, |s, &exp| s + base.pow(exp as u32)))
-            .collect::<Vec<_>>();
+        debug!(
+            " target: {:?}, transitions: {:?}",
+            target, transition_idx_vecs
+        );
 
-        debug!(" target: {}, transitions: {:?}", target, transitions);
-
-        (target, transitions)
+        (target, transition_idx_vecs)
     }
 }
 
