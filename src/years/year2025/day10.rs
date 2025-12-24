@@ -2,9 +2,10 @@ use crate::solver::{Part, Solver};
 use anyhow::Result;
 use log::debug;
 use std::collections::{HashSet, VecDeque};
-use std::ops::BitXor;
 
 pub struct Day10;
+
+const EPSILON: f64 = 1e-10;
 
 impl Solver for Day10 {
     fn year(&self) -> u16 {
@@ -83,19 +84,18 @@ impl Solver for Day10 {
     */
     fn part2(&self, input: &str) -> Result<String> {
         let total = input.trim().lines().fold(0usize, |total, line| {
-            #[allow(unused)]
-            let (target_vec, transition_idx_vec) = Self::parse(line, Part::Two);
-            // let target = target_vec
-            //     .iter()
-            //     .fold(0usize, |s, idx| s + (1 << idx) as usize);
-            // let transitions = transition_idx_vec
-            //     .iter()
-            //     .map(|transition_idx_vec| {
-            //         transition_idx_vec.iter().fold(0usize, |s, idx| s + (1 << idx) as usize)
-            //     })
-            //     .collect::<Vec<_>>();
-            // total + Self::solve_part1(target, &transitions)
-            total
+            let (target, transition_idx_vec) = Self::parse(line, Part::Two);
+            let basis = transition_idx_vec
+                .iter()
+                .map(|transition_idx_vec| {
+                    let mut transition = vec![0; target.len()];
+                    transition_idx_vec
+                        .iter()
+                        .for_each(|idx| transition[*idx] = 1);
+                    transition
+                })
+                .collect::<Vec<_>>();
+            total + Self::solve_part2(&target, &basis)
         });
 
         Ok(total.to_string())
@@ -120,11 +120,138 @@ impl Day10 {
             }
 
             transitions.iter().for_each(|&transition| {
-                stack.push_front((current_value.bitxor(transition), num_steps + 1))
+                stack.push_front((current_value ^ transition, num_steps + 1))
             })
         }
 
         0
+    }
+
+    fn solve_part2(target: &[usize], vectors: &[Vec<usize>]) -> usize {
+        debug!("target {:?} vectors {:?}", target, vectors);
+        let n = vectors.len();
+        let d = target.len();
+
+        // Arrange vectors into columns of matrix A
+        let mut a = (0..vectors[0].len()).map(|_| vec![]).collect::<Vec<_>>();
+        for v in vectors {
+            for (item, a_row) in v.iter().zip(&mut a) {
+                a_row.push(item);
+            }
+        }
+
+        // Find initial feasible solution
+        let mut basis = (0..d).map(|i| n + i).collect::<Vec<_>>();
+
+        // Create extended tableau with artificial variables
+        // [A | I | b] where I is d×d identity for artificial vars
+        let mut tableau: Vec<Vec<isize>> = Vec::with_capacity(d);
+        debug!("initial tableau:");
+        for (i, t) in target.iter().enumerate() {
+            let mut tableau_row = vec![0; n + d + 1];
+            // A
+            (0..n).for_each(|j| tableau_row[j] = vectors[j][i] as isize);
+            // Identity matrix representing artifical variables
+            tableau_row[n + i] = 1;
+            // b
+            tableau_row[n + d] = *t as isize;
+
+            debug!(" {:?}", tableau_row);
+            tableau.push(tableau_row);
+        }
+
+        let mut phase1_cost = Vec::with_capacity(d + n);
+        (0..(d + n)).for_each(|i| phase1_cost.push(if i < n { 0 } else { 1 }));
+
+        // Find entering variable (most negative reduced cost)
+        while let Some(entering) = Self::find_entering(&tableau, &phase1_cost, &basis) {
+            // Find leaving variable (minimum ratio test)
+            let leaving_opt = Self::find_leaving(&tableau, &entering);
+            if Option::is_none(&leaving_opt) {
+                panic!("unbounded");
+            }
+            let leaving = leaving_opt.unwrap();
+
+            Self::pivot(&mut tableau, &entering, &leaving);
+
+            basis[leaving] = entering;
+
+            debug!(" {:?}", tableau);
+        }
+
+        // Optimize actual objective (sum of coefficients)
+        0
+    }
+
+    fn find_entering(tableau: &[Vec<isize>], cost: &[usize], basis: &[usize]) -> Option<usize> {
+        // Compute reduced costs for non-basic variables
+        // reduced_cost[j] = c[j] - basis_cost^T * A[j]
+
+        let mut min_reduced_cost = 0;
+        let mut entering = None;
+
+        for j in 0..tableau.len() - 1 {
+            if basis.contains(&j) {
+                continue;
+            }
+
+            // Compute reduced cost
+            let mut reduced_cost = cost[j] as isize;
+            for (i, basis_var) in basis.iter().enumerate() {
+                reduced_cost -= (cost[*basis_var] as isize) * tableau[i][j];
+            }
+
+            if reduced_cost < min_reduced_cost {
+                min_reduced_cost = reduced_cost;
+                entering = Some(j);
+            }
+        }
+
+        entering
+    }
+
+    fn find_leaving(tableau: &[Vec<isize>], entering_col: &usize) -> Option<usize> {
+        // Minimum ratio test: min(b[i] / A[i][entering]) for A[i][entering] > 0
+
+        let mut min_ratio = f64::INFINITY;
+        let mut leaving = None;
+
+        for (i, tableau_row) in tableau.iter().enumerate() {
+            if tableau_row[*entering_col] as f64 > EPSILON {
+                let ratio =
+                    tableau_row[tableau_row.len() - 1] as f64 / tableau_row[*entering_col] as f64;
+                if ratio < min_ratio {
+                    min_ratio = ratio;
+                    leaving = Some(i);
+                }
+            }
+        }
+
+        leaving
+    }
+
+    fn pivot(tableau: &mut [Vec<isize>], row: &usize, col: &usize) {
+        debug!("PIVOT row: {:?}, col: {:?}", row, col);
+        // Make tableau[row][col] = 1 and all other entries in column = 0
+
+        let pivot_element = tableau[*row][*col];
+        debug_assert_eq!(pivot_element, 1);
+
+        // In general this should be a float division but since our vectors are all
+        // binary (1s and 0s) this is a noop
+        //for j in 0..num_columns:
+        //    tableau[row][j] /= pivot_element
+
+        // Eliminate other rows
+        for i in 0..tableau.len() {
+            if i != *row {
+                let multiplier = tableau[i][*col];
+
+                for j in 0..tableau[*row].len() {
+                    tableau[i][j] -= multiplier * tableau[*row][j];
+                }
+            }
+        }
     }
 
     fn parse(line: &str, part: Part) -> (Vec<usize>, Vec<Vec<usize>>) {
